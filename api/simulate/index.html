@@ -1,0 +1,3472 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Synthetic diffusion MRI phantom library">
+      
+      
+      
+      
+        <link rel="prev" href="../bundle/">
+      
+      
+        <link rel="next" href="../../examples/bundleseg_phantom/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Simulate - SymDWI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#simulate" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SymDWI" class="md-header__button md-logo" aria-label="SymDWI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SymDWI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Simulate
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SymDWI" class="md-nav__button md-logo" aria-label="SymDWI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    SymDWI
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bundle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bundle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulate
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulate
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.DWIParameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DWIParameters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.simulate_dwi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        simulate_dwi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.generate_bvals_bvecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_bvals_bvecs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.extract_groundtruth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_groundtruth
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.save_dwi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        save_dwi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.save_groundtruth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        save_groundtruth
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.world_bvecs_to_fsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        world_bvecs_to_fsl
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.compute_signal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compute_signal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.make_affine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_affine
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/basic_phantom.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Phantom
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/bundleseg_phantom/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BundleSeg Full-Brain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.DWIParameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DWIParameters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.simulate_dwi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        simulate_dwi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.generate_bvals_bvecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_bvals_bvecs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.extract_groundtruth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_groundtruth
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.save_dwi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        save_dwi
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.save_groundtruth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        save_groundtruth
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.world_bvecs_to_fsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        world_bvecs_to_fsl
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.compute_signal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compute_signal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#symdwi.simulate.make_affine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_affine
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="simulate">Simulate</h1>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="symdwi.simulate.DWIParameters" class="doc doc-heading">
+            <code>symdwi.simulate.DWIParameters</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Biophysical parameters for the Standard Model DWI simulation.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>f_intra</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Intra-axonal signal fraction in pure-fiber voxels.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.7</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>f_extra</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Extra-axonal signal fraction in pure-fiber voxels.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.3</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>f_csf</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Free-water signal fraction in pure-fiber voxels.
+Must satisfy f_intra + f_extra + f_csf == 1.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>di_axial</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Intra-axonal axial diffusivity (mm^2/s).</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.0017</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>de_axial</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Extra-axonal axial diffusivity (mm^2/s).</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.0017</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>de_radial</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Extra-axonal radial diffusivity (mm^2/s).</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.0005</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>d_iso</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Free-water (CSF) isotropic diffusivity (mm^2/s).</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.003</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>d_gm</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Gray matter isotropic diffusivity (mm^2/s). Used when a "gm" tissue
+mask is provided. T2 weighting uses t2_extra_ms as the closest analog.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.0008</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>axon_radius_um</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span> or None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Axon radius in micrometers. Converts streamline point density to a
+physical intra-axonal volume fraction. Set to None for relative density scaling.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>te_ms</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span> or None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Echo time in ms. Set to None to disable T2 relaxation weighting.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>t2_intra_ms</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>T2 relaxation time for the intra-axonal compartment (ms).</p>
+              </div>
+            </td>
+            <td>
+                  <code>70.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>t2_extra_ms</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>T2 relaxation time for the extra-axonal compartment (ms).
+Also used as T2 weight for the GM compartment.</p>
+              </div>
+            </td>
+            <td>
+                  <code>70.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>t2_csf_ms</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>T2 relaxation time for the CSF/free-water compartment (ms).</p>
+              </div>
+            </td>
+            <td>
+                  <code>2000.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>background_csf</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Constant free-water signal added to every voxel (including background).
+Set to 0.0 for a silent background.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>symdwi/simulate.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DWIParameters</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Biophysical parameters for the Standard Model DWI simulation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f_intra : float</span>
+<span class="sd">        Intra-axonal signal fraction in pure-fiber voxels.</span>
+<span class="sd">    f_extra : float</span>
+<span class="sd">        Extra-axonal signal fraction in pure-fiber voxels.</span>
+<span class="sd">    f_csf : float</span>
+<span class="sd">        Free-water signal fraction in pure-fiber voxels.</span>
+<span class="sd">        Must satisfy f_intra + f_extra + f_csf == 1.</span>
+<span class="sd">    di_axial : float</span>
+<span class="sd">        Intra-axonal axial diffusivity (mm^2/s).</span>
+<span class="sd">    de_axial : float</span>
+<span class="sd">        Extra-axonal axial diffusivity (mm^2/s).</span>
+<span class="sd">    de_radial : float</span>
+<span class="sd">        Extra-axonal radial diffusivity (mm^2/s).</span>
+<span class="sd">    d_iso : float</span>
+<span class="sd">        Free-water (CSF) isotropic diffusivity (mm^2/s).</span>
+<span class="sd">    d_gm : float</span>
+<span class="sd">        Gray matter isotropic diffusivity (mm^2/s). Used when a &quot;gm&quot; tissue</span>
+<span class="sd">        mask is provided. T2 weighting uses t2_extra_ms as the closest analog.</span>
+<span class="sd">    axon_radius_um : float or None</span>
+<span class="sd">        Axon radius in micrometers. Converts streamline point density to a</span>
+<span class="sd">        physical intra-axonal volume fraction. Set to None for relative density scaling.</span>
+<span class="sd">    te_ms : float or None</span>
+<span class="sd">        Echo time in ms. Set to None to disable T2 relaxation weighting.</span>
+<span class="sd">    t2_intra_ms : float</span>
+<span class="sd">        T2 relaxation time for the intra-axonal compartment (ms).</span>
+<span class="sd">    t2_extra_ms : float</span>
+<span class="sd">        T2 relaxation time for the extra-axonal compartment (ms).</span>
+<span class="sd">        Also used as T2 weight for the GM compartment.</span>
+<span class="sd">    t2_csf_ms : float</span>
+<span class="sd">        T2 relaxation time for the CSF/free-water compartment (ms).</span>
+<span class="sd">    background_csf : float</span>
+<span class="sd">        Constant free-water signal added to every voxel (including background).</span>
+<span class="sd">        Set to 0.0 for a silent background.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f_intra</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">f_extra</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span>
+    <span class="n">f_csf</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">di_axial</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.7e-3</span>
+    <span class="n">de_axial</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.7e-3</span>
+    <span class="n">de_radial</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5e-3</span>
+    <span class="n">d_iso</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3.0e-3</span>
+    <span class="n">d_gm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8e-3</span>
+    <span class="n">axon_radius_um</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">te_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">t2_intra_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">70.0</span>
+    <span class="n">t2_extra_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">70.0</span>
+    <span class="n">t2_csf_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2000.0</span>
+    <span class="n">background_csf</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_intra</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_extra</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_csf</span>
+        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Compartment fractions must sum to 1.0 (got </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">)&quot;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="symdwi.simulate.simulate_dwi" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">symdwi</span><span class="o">.</span><span class="n">simulate</span><span class="o">.</span><span class="n">simulate_dwi</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span> <span class="n">voxel_size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">snr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tissue_masks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="s1">&#39;repulsion724&#39;</span><span class="p">,</span> <span class="n">return_groundtruth</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_peaks</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Simulate a DWI volume from a set of fiber bundles.</p>
+<p>Uses the Standard Model of white matter: stick (intra-axonal),
+zeppelin (extra-axonal), and ball (free water) compartments.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>bundles</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="symdwi.bundle.Bundle" href="../bundle/#symdwi.bundle.Bundle">Bundle</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bvals</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="N">N</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>b-values in s/mm^2. Include a b=0 entry as a zero.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bvecs</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="N">N</span>, 3))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Gradient directions. b=0 entries should be zero vectors.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>params</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="symdwi.simulate.DWIParameters
+
+
+  
+      dataclass
+  " href="#symdwi.simulate.DWIParameters">DWIParameters</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>origin</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span> or None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>World-space corner of the volume in mm.
+Auto-computed from bundle extents if None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dims</code>
+            </td>
+            <td>
+                  <code><span title="tuple">tuple</span>[<span title="int">int</span>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Volume shape in voxels.</p>
+              </div>
+            </td>
+            <td>
+                  <code>(64, 64, 64)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>voxel_size</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Isotropic voxel size in mm.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>snr</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span> or None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If given, adds Rician noise with sigma = 1/snr (S0 = 1).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n_jobs</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of threads for parallel voxel processing. Default 1 (no threading).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tissue_masks</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span> or None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional tissue probability/binary maps. Accepted keys: "wm", "gm", "csf".
+Each value must be a 3D array matching <code>dims</code>, with values in [0, 1].
+Binary (0/1) and probabilistic masks are both accepted.
+Per-voxel tissue fractions are normalised to sum to 1 before use.
+The "gm" compartment is modelled as an isotropic ball with params.d_gm.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sphere</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the dipy sphere used to discretise fiber tangents into per-voxel
+direction bins (e.g. "repulsion100", "repulsion724"). Higher vertex counts
+reduce orientation quantisation error at a modest cost (~10% slower for
+724 vs 100 vertices, since only populated bins are evaluated per voxel).</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;repulsion724&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>return_groundtruth</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, also return a dict of per-voxel ground-truth labels derived
+directly from the fiber geometry (noise-independent). See Returns.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_peaks</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of fiber-orientation peaks stored per voxel in the
+ground-truth output. Only used when return_groundtruth is True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>3</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>seed</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span> or None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Seed for the Rician noise RNG. Set for reproducible datasets (the
+signal itself is deterministic; only the noise draw uses this). None
+uses fresh, non-reproducible randomness. Ignored when snr is None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>verbose</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Verbosity level. 0 = silent, 1 = step-level prints, 2 = 1 + tqdm progress bar
+during signal computation (per-voxel when n_jobs=1, per-chunk when threaded).</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>signal</code></td>            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(*<span title="dims">dims</span>, <span title="N">N</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td><code>affine</code></td>            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(4, 4))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td><code>groundtruth</code></td>            <td>
+                  <code>dict, only if return_groundtruth is True</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Per-voxel ground truth in the same world frame as <code>affine</code>:
+  - "wm_mask" : uint8 (<em>dims), 1 where a fiber is present.
+  - "fiber_fraction" : float32 (</em>dims), intra-axonal volume fraction.
+  - "peaks" : float32 (<em>dims, max_peaks, 3), unit peak directions
+                       (world space), zero-padded, sorted by amplitude.
+  - "peak_values" : float32 (</em>dims, max_peaks), peak amplitudes.
+  - "sphere" : the dipy Sphere used for direction discretisation.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>symdwi/simulate.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">simulate_dwi</span><span class="p">(</span>
+    <span class="n">bundles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Bundle</span><span class="p">],</span>
+    <span class="n">bvals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">bvecs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">DWIParameters</span><span class="p">,</span>
+    <span class="n">origin</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+    <span class="n">voxel_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">snr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">tissue_masks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">sphere</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;repulsion724&quot;</span><span class="p">,</span>
+    <span class="n">return_groundtruth</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_peaks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simulate a DWI volume from a set of fiber bundles.</span>
+
+<span class="sd">    Uses the Standard Model of white matter: stick (intra-axonal),</span>
+<span class="sd">    zeppelin (extra-axonal), and ball (free water) compartments.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bundles : list[Bundle]</span>
+<span class="sd">    bvals : np.ndarray, shape (N,)</span>
+<span class="sd">        b-values in s/mm^2. Include a b=0 entry as a zero.</span>
+<span class="sd">    bvecs : np.ndarray, shape (N, 3)</span>
+<span class="sd">        Gradient directions. b=0 entries should be zero vectors.</span>
+<span class="sd">    params : DWIParameters</span>
+<span class="sd">    origin : np.ndarray or None</span>
+<span class="sd">        World-space corner of the volume in mm.</span>
+<span class="sd">        Auto-computed from bundle extents if None.</span>
+<span class="sd">    dims : tuple[int, ...]</span>
+<span class="sd">        Volume shape in voxels.</span>
+<span class="sd">    voxel_size : float</span>
+<span class="sd">        Isotropic voxel size in mm.</span>
+<span class="sd">    snr : float or None</span>
+<span class="sd">        If given, adds Rician noise with sigma = 1/snr (S0 = 1).</span>
+<span class="sd">    n_jobs : int</span>
+<span class="sd">        Number of threads for parallel voxel processing. Default 1 (no threading).</span>
+<span class="sd">    tissue_masks : dict or None</span>
+<span class="sd">        Optional tissue probability/binary maps. Accepted keys: &quot;wm&quot;, &quot;gm&quot;, &quot;csf&quot;.</span>
+<span class="sd">        Each value must be a 3D array matching `dims`, with values in [0, 1].</span>
+<span class="sd">        Binary (0/1) and probabilistic masks are both accepted.</span>
+<span class="sd">        Per-voxel tissue fractions are normalised to sum to 1 before use.</span>
+<span class="sd">        The &quot;gm&quot; compartment is modelled as an isotropic ball with params.d_gm.</span>
+<span class="sd">    sphere : str</span>
+<span class="sd">        Name of the dipy sphere used to discretise fiber tangents into per-voxel</span>
+<span class="sd">        direction bins (e.g. &quot;repulsion100&quot;, &quot;repulsion724&quot;). Higher vertex counts</span>
+<span class="sd">        reduce orientation quantisation error at a modest cost (~10% slower for</span>
+<span class="sd">        724 vs 100 vertices, since only populated bins are evaluated per voxel).</span>
+<span class="sd">    return_groundtruth : bool</span>
+<span class="sd">        If True, also return a dict of per-voxel ground-truth labels derived</span>
+<span class="sd">        directly from the fiber geometry (noise-independent). See Returns.</span>
+<span class="sd">    max_peaks : int</span>
+<span class="sd">        Maximum number of fiber-orientation peaks stored per voxel in the</span>
+<span class="sd">        ground-truth output. Only used when return_groundtruth is True.</span>
+<span class="sd">    seed : int or None</span>
+<span class="sd">        Seed for the Rician noise RNG. Set for reproducible datasets (the</span>
+<span class="sd">        signal itself is deterministic; only the noise draw uses this). None</span>
+<span class="sd">        uses fresh, non-reproducible randomness. Ignored when snr is None.</span>
+<span class="sd">    verbose : int</span>
+<span class="sd">        Verbosity level. 0 = silent, 1 = step-level prints, 2 = 1 + tqdm progress bar</span>
+<span class="sd">        during signal computation (per-voxel when n_jobs=1, per-chunk when threaded).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    signal : np.ndarray, shape (*dims, N)</span>
+<span class="sd">    affine : np.ndarray, shape (4, 4)</span>
+<span class="sd">    groundtruth : dict, only if return_groundtruth is True</span>
+<span class="sd">        Per-voxel ground truth in the same world frame as `affine`:</span>
+<span class="sd">          - &quot;wm_mask&quot; : uint8 (*dims), 1 where a fiber is present.</span>
+<span class="sd">          - &quot;fiber_fraction&quot; : float32 (*dims), intra-axonal volume fraction.</span>
+<span class="sd">          - &quot;peaks&quot; : float32 (*dims, max_peaks, 3), unit peak directions</span>
+<span class="sd">                               (world space), zero-padded, sorted by amplitude.</span>
+<span class="sd">          - &quot;peak_values&quot; : float32 (*dims, max_peaks), peak amplitudes.</span>
+<span class="sd">          - &quot;sphere&quot; : the dipy Sphere used for direction discretisation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">bvals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">bvecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">bvecs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">bvecs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">safe_norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">norms</span> <span class="o">&gt;</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="n">norms</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">bvecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">norms</span> <span class="o">&gt;</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="n">bvecs</span> <span class="o">/</span> <span class="n">safe_norms</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">dims_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tissue_masks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">valid_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;wm&quot;</span><span class="p">,</span> <span class="s2">&quot;gm&quot;</span><span class="p">,</span> <span class="s2">&quot;csf&quot;</span><span class="p">}</span>
+        <span class="n">bad</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">tissue_masks</span><span class="p">)</span> <span class="o">-</span> <span class="n">valid_keys</span>
+        <span class="k">if</span> <span class="n">bad</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;tissue_masks has unknown keys: </span><span class="si">{</span><span class="n">bad</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">tissue_masks</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">tissue_masks</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">tissue_masks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dims</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;tissue_masks[&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;] shape </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> != dims </span><span class="si">{</span><span class="n">dims</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">all_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">points_with_orientation</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bundles</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">all_pts</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">all_pts</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="p">(</span><span class="n">lo</span> <span class="o">+</span> <span class="n">hi</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dims_arr</span> <span class="o">*</span> <span class="n">voxel_size</span>
+
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Voxelising </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">bundles</span><span class="p">)</span><span class="si">}</span><span class="s2"> bundle(s) into </span><span class="si">{</span><span class="n">dims</span><span class="si">}</span><span class="s2"> grid...&quot;</span><span class="p">)</span>
+    <span class="n">sphere</span> <span class="o">=</span> <span class="n">get_sphere</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">sphere</span><span class="p">)</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">voxelise_bundles</span><span class="p">(</span><span class="n">bundles</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="n">sphere</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">volume</span><span class="p">)</span><span class="si">}</span><span class="s2"> fiber voxels found.&quot;</span><span class="p">)</span>
+
+    <span class="n">density</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">volume</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">axon_radius_um</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">r_mm</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">axon_radius_um</span> <span class="o">*</span> <span class="mf">1e-3</span>
+        <span class="n">voxel_vol</span> <span class="o">=</span> <span class="n">voxel_size</span> <span class="o">**</span> <span class="mi">3</span>
+        <span class="n">fiber_vols</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">r_mm</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">c</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">density</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">max_fiber_vol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">fiber_vols</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">if</span> <span class="n">fiber_vols</span> <span class="k">else</span> <span class="mf">1.0</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">f_intra</span> <span class="o">*</span> <span class="n">voxel_vol</span> <span class="o">/</span> <span class="n">max_fiber_vol</span>
+        <span class="n">density_frac</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">f_intra</span><span class="p">,</span> <span class="n">fv</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">/</span> <span class="n">voxel_vol</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">fv</span> <span class="ow">in</span> <span class="n">fiber_vols</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">max_density</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">density</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">if</span> <span class="n">density</span> <span class="k">else</span> <span class="mf">1.0</span>
+        <span class="n">density_frac</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">params</span><span class="o">.</span><span class="n">f_intra</span> <span class="o">*</span> <span class="n">c</span> <span class="o">/</span> <span class="n">max_density</span>
+                        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">density</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">volume</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">volume</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span> <span class="o">/</span> <span class="n">v</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="n">groundtruth</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">return_groundtruth</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Extracting ground-truth peaks...&quot;</span><span class="p">)</span>
+        <span class="n">groundtruth</span> <span class="o">=</span> <span class="n">extract_groundtruth</span><span class="p">(</span>
+            <span class="n">volume</span><span class="p">,</span> <span class="n">density_frac</span><span class="p">,</span> <span class="n">sphere</span><span class="p">,</span> <span class="n">dims_arr</span><span class="p">,</span> <span class="n">max_peaks</span><span class="o">=</span><span class="n">max_peaks</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">n_jobs</span><span class="si">}</span><span class="s2"> threads)&quot;</span> <span class="k">if</span> <span class="n">n_jobs</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;(single-threaded)&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Computing DWI signal </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">compute_signal</span><span class="p">(</span>
+        <span class="n">volume</span><span class="p">,</span> <span class="n">density_frac</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">,</span> <span class="n">dims_arr</span><span class="p">,</span> <span class="n">sphere</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">tissue_masks</span><span class="o">=</span><span class="n">tissue_masks</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Signal computation done.&quot;</span><span class="p">)</span>
+
+    <span class="n">affine</span> <span class="o">=</span> <span class="n">make_affine</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">snr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Adding Rician noise (SNR=</span><span class="si">{</span><span class="n">snr</span><span class="si">}</span><span class="s2">)...&quot;</span><span class="p">)</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">snr</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">signal</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">i</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_groundtruth</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">signal</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">groundtruth</span>
+    <span class="k">return</span> <span class="n">signal</span><span class="p">,</span> <span class="n">affine</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="symdwi.simulate.generate_bvals_bvecs" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">symdwi</span><span class="o">.</span><span class="n">simulate</span><span class="o">.</span><span class="n">generate_bvals_bvecs</span><span class="p">(</span><span class="n">shells</span><span class="o">=</span><span class="p">[(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span> <span class="p">(</span><span class="mi">2500</span><span class="p">,</span> <span class="mi">64</span><span class="p">)],</span> <span class="n">n_b0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">iters</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Generate a multi-shell gradient table via electrostatic charge repulsion.</p>
+<p>Directions for each shell are independently optimised on the hemisphere.
+b=0 volumes are prepended.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>shells</code>
+            </td>
+            <td>
+                  <code>list of (b_value, n_directions) tuples</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Each entry defines one shell. Example: [(1000, 32), (3000, 64)].</p>
+              </div>
+            </td>
+            <td>
+                  <code>[(1000, 64), (2500, 64)]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n_b0</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of b=0 volumes prepended to the table.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>iters</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of charge-dispersion iterations per shell.</p>
+              </div>
+            </td>
+            <td>
+                  <code>500</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>seed</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span> or None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>RNG seed.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bvals</code></td>            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="n_b0">n_b0</span> + <span title="sum">sum</span>(<span title="n_dirs">n_dirs</span>)))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>b-values in s/mm^2.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td><code>bvecs</code></td>            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="n_b0">n_b0</span> + <span title="sum">sum</span>(<span title="n_dirs">n_dirs</span>), 3))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Unit gradient directions. b=0 rows are zero vectors.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>symdwi/simulate.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_bvals_bvecs</span><span class="p">(</span>
+    <span class="n">shells</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span> <span class="p">(</span><span class="mi">2500</span><span class="p">,</span> <span class="mi">64</span><span class="p">)],</span>
+    <span class="n">n_b0</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">iters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a multi-shell gradient table via electrostatic charge repulsion.</span>
+
+<span class="sd">    Directions for each shell are independently optimised on the hemisphere.</span>
+<span class="sd">    b=0 volumes are prepended.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    shells : list of (b_value, n_directions) tuples</span>
+<span class="sd">        Each entry defines one shell. Example: [(1000, 32), (3000, 64)].</span>
+<span class="sd">    n_b0 : int</span>
+<span class="sd">        Number of b=0 volumes prepended to the table.</span>
+<span class="sd">    iters : int</span>
+<span class="sd">        Number of charge-dispersion iterations per shell.</span>
+<span class="sd">    seed : int or None</span>
+<span class="sd">        RNG seed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bvals : np.ndarray, shape (n_b0 + sum(n_dirs),)</span>
+<span class="sd">        b-values in s/mm^2.</span>
+<span class="sd">    bvecs : np.ndarray, shape (n_b0 + sum(n_dirs), 3)</span>
+<span class="sd">        Unit gradient directions. b=0 rows are zero vectors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">all_bvals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_bvecs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">bval</span><span class="p">,</span> <span class="n">n_pts</span> <span class="ow">in</span> <span class="n">shells</span><span class="p">:</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n_pts</span><span class="p">)</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n_pts</span><span class="p">)</span>
+        <span class="n">hsph_initial</span> <span class="o">=</span> <span class="n">HemiSphere</span><span class="p">(</span><span class="n">theta</span><span class="o">=</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">)</span>
+        <span class="n">hsph_updated</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">disperse_charges</span><span class="p">(</span><span class="n">hsph_initial</span><span class="p">,</span> <span class="n">iters</span><span class="o">=</span><span class="n">iters</span><span class="p">)</span>
+        <span class="n">all_bvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bval</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_pts</span><span class="p">))</span>
+        <span class="n">all_bvecs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hsph_updated</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+
+    <span class="n">bvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_b0</span><span class="p">,</span> <span class="o">*</span><span class="n">all_bvals</span><span class="p">])</span>
+    <span class="n">bvecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_b0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="o">*</span><span class="n">all_bvecs</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="symdwi.simulate.extract_groundtruth" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">symdwi</span><span class="o">.</span><span class="n">simulate</span><span class="o">.</span><span class="n">extract_groundtruth</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">density_frac</span><span class="p">,</span> <span class="n">sphere</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">max_peaks</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">relative_peak_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_separation_angle</span><span class="o">=</span><span class="mf">25.0</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Extract per-voxel ground-truth fiber labels from a voxelised ODF grid.</p>
+<p>Derives a white-matter mask, intra-axonal fiber fraction, and discrete
+fiber-orientation peaks directly from the streamline geometry (independent
+of the diffusion signal or any added noise). Peaks are found as local
+maxima of each voxel's direction histogram on the discretisation sphere.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>volume</code>
+            </td>
+            <td>
+                  <code><span title="collections.defaultdict">defaultdict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Sparse per-voxel direction distributions, normalised to sum to 1
+(as produced inside simulate_dwi after ODF normalisation).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>density_frac</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Intra-axonal volume fraction per voxel key.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sphere</code>
+            </td>
+            <td>
+                  <code>dipy Sphere</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The sphere used to build <code>volume</code>. Peak directions are returned in the
+same (world) frame as its vertices.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dims</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(3))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Volume dimensions in voxels.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_peaks</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of peaks stored per voxel.</p>
+              </div>
+            </td>
+            <td>
+                  <code>3</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>relative_peak_threshold</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Discard peaks below this fraction of the largest peak in a voxel.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.5</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>min_separation_angle</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Merge peaks closer than this angle (degrees).</p>
+              </div>
+            </td>
+            <td>
+                  <code>25.0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>See simulate_dwi's <code>groundtruth</code> return for the keys.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>symdwi/simulate.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">extract_groundtruth</span><span class="p">(</span>
+    <span class="n">volume</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">,</span>
+    <span class="n">density_frac</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">sphere</span><span class="p">,</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">max_peaks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">relative_peak_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">min_separation_angle</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">25.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract per-voxel ground-truth fiber labels from a voxelised ODF grid.</span>
+
+<span class="sd">    Derives a white-matter mask, intra-axonal fiber fraction, and discrete</span>
+<span class="sd">    fiber-orientation peaks directly from the streamline geometry (independent</span>
+<span class="sd">    of the diffusion signal or any added noise). Peaks are found as local</span>
+<span class="sd">    maxima of each voxel&#39;s direction histogram on the discretisation sphere.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    volume : defaultdict</span>
+<span class="sd">        Sparse per-voxel direction distributions, normalised to sum to 1</span>
+<span class="sd">        (as produced inside simulate_dwi after ODF normalisation).</span>
+<span class="sd">    density_frac : dict</span>
+<span class="sd">        Intra-axonal volume fraction per voxel key.</span>
+<span class="sd">    sphere : dipy Sphere</span>
+<span class="sd">        The sphere used to build `volume`. Peak directions are returned in the</span>
+<span class="sd">        same (world) frame as its vertices.</span>
+<span class="sd">    dims : np.ndarray, shape (3,)</span>
+<span class="sd">        Volume dimensions in voxels.</span>
+<span class="sd">    max_peaks : int</span>
+<span class="sd">        Maximum number of peaks stored per voxel.</span>
+<span class="sd">    relative_peak_threshold : float</span>
+<span class="sd">        Discard peaks below this fraction of the largest peak in a voxel.</span>
+<span class="sd">    min_separation_angle : float</span>
+<span class="sd">        Merge peaks closer than this angle (degrees).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        See simulate_dwi&#39;s `groundtruth` return for the keys.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dipy.direction</span><span class="w"> </span><span class="kn">import</span> <span class="n">peak_directions</span>
+
+    <span class="n">dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">)</span>
+    <span class="n">wm_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">fiber_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">peaks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="o">*</span><span class="n">dims</span><span class="p">,</span> <span class="n">max_peaks</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">peak_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="o">*</span><span class="n">dims</span><span class="p">,</span> <span class="n">max_peaks</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">odf</span> <span class="ow">in</span> <span class="n">volume</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">wm_mask</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">fiber_fraction</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">density_frac</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">dirs</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">peak_directions</span><span class="p">(</span>
+            <span class="n">odf</span><span class="p">,</span> <span class="n">sphere</span><span class="p">,</span>
+            <span class="n">relative_peak_threshold</span><span class="o">=</span><span class="n">relative_peak_threshold</span><span class="p">,</span>
+            <span class="n">min_separation_angle</span><span class="o">=</span><span class="n">min_separation_angle</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dirs</span><span class="p">),</span> <span class="n">max_peaks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">peaks</span><span class="p">[</span><span class="n">k</span><span class="p">][:</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">dirs</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+            <span class="n">peak_values</span><span class="p">[</span><span class="n">k</span><span class="p">][:</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;wm_mask&quot;</span><span class="p">:</span> <span class="n">wm_mask</span><span class="p">,</span>
+        <span class="s2">&quot;fiber_fraction&quot;</span><span class="p">:</span> <span class="n">fiber_fraction</span><span class="p">,</span>
+        <span class="s2">&quot;peaks&quot;</span><span class="p">:</span> <span class="n">peaks</span><span class="p">,</span>
+        <span class="s2">&quot;peak_values&quot;</span><span class="p">:</span> <span class="n">peak_values</span><span class="p">,</span>
+        <span class="s2">&quot;sphere&quot;</span><span class="p">:</span> <span class="n">sphere</span><span class="p">,</span>
+    <span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="symdwi.simulate.save_dwi" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">symdwi</span><span class="o">.</span><span class="n">simulate</span><span class="o">.</span><span class="n">save_dwi</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">to_fsl</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Save DWI data to a directory.</p>
+<p>Writes three files into <code>path</code>: <code>dwi.nii.gz</code>, <code>bvals.txt</code>, <code>bvecs.txt</code>.
+<code>bvecs.txt</code> is written in FSL convention (see world_bvecs_to_fsl) so it
+reconstructs correctly with FSL and with MRtrix's <code>-fslgrad</code> option.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>signal</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(*<span title="dims">dims</span>, <span title="N">N</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>affine</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(4, 4))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bvals</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="N">N</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bvecs</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="N">N</span>, 3))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Unit gradient directions in world space.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> or <span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Output directory.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>symdwi/simulate.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_dwi</span><span class="p">(</span>
+    <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">affine</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">bvals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">bvecs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">to_fsl</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save DWI data to a directory.</span>
+
+<span class="sd">    Writes three files into `path`: `dwi.nii.gz`, `bvals.txt`, `bvecs.txt`.</span>
+<span class="sd">    `bvecs.txt` is written in FSL convention (see world_bvecs_to_fsl) so it</span>
+<span class="sd">    reconstructs correctly with FSL and with MRtrix&#39;s `-fslgrad` option.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    signal : np.ndarray, shape (*dims, N)</span>
+<span class="sd">    affine : np.ndarray, shape (4, 4)</span>
+<span class="sd">    bvals : np.ndarray, shape (N,)</span>
+<span class="sd">    bvecs : np.ndarray, shape (N, 3)</span>
+<span class="sd">        Unit gradient directions in world space.</span>
+<span class="sd">    path : str or Path</span>
+<span class="sd">        Output directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">affine</span><span class="p">)</span>
+    <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;dwi.nii.gz&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">to_fsl</span><span class="p">:</span>
+        <span class="n">bvecs</span> <span class="o">=</span> <span class="n">world_bvecs_to_fsl</span><span class="p">(</span><span class="n">bvecs</span><span class="p">,</span> <span class="n">affine</span><span class="p">)</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;bvals.txt&quot;</span><span class="p">,</span> <span class="n">bvals</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:],</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;bvecs.txt&quot;</span><span class="p">,</span> <span class="n">bvecs</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="symdwi.simulate.save_groundtruth" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">symdwi</span><span class="o">.</span><span class="n">simulate</span><span class="o">.</span><span class="n">save_groundtruth</span><span class="p">(</span><span class="n">groundtruth</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Save per-voxel ground-truth labels to a directory.</p>
+<p>Writes into <code>path</code>:
+  - <code>wm_mask.nii.gz</code> : uint8 fiber-presence mask.
+  - <code>fiber_fraction.nii.gz</code> : float32 intra-axonal volume fraction.
+  - <code>peaks.nii.gz</code> : float32 (<em>dims, max_peaks</em>3), peak directions
+                              interleaved [x0,y0,z0,x1,y1,z1,...] — the same
+                              layout as MRtrix <code>sh2peaks</code> output, so it can be
+                              compared/overlaid directly.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>groundtruth</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dict returned by simulate_dwi(..., return_groundtruth=True).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>affine</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(4, 4))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> or <span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Output directory.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>symdwi/simulate.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_groundtruth</span><span class="p">(</span>
+    <span class="n">groundtruth</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">affine</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save per-voxel ground-truth labels to a directory.</span>
+
+<span class="sd">    Writes into `path`:</span>
+<span class="sd">      - `wm_mask.nii.gz` : uint8 fiber-presence mask.</span>
+<span class="sd">      - `fiber_fraction.nii.gz` : float32 intra-axonal volume fraction.</span>
+<span class="sd">      - `peaks.nii.gz` : float32 (*dims, max_peaks*3), peak directions</span>
+<span class="sd">                                  interleaved [x0,y0,z0,x1,y1,z1,...] — the same</span>
+<span class="sd">                                  layout as MRtrix `sh2peaks` output, so it can be</span>
+<span class="sd">                                  compared/overlaid directly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    groundtruth : dict</span>
+<span class="sd">        The dict returned by simulate_dwi(..., return_groundtruth=True).</span>
+<span class="sd">    affine : np.ndarray, shape (4, 4)</span>
+<span class="sd">    path : str or Path</span>
+<span class="sd">        Output directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">gt</span> <span class="o">=</span> <span class="n">groundtruth</span>
+    <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">gt</span><span class="p">[</span><span class="s2">&quot;wm_mask&quot;</span><span class="p">],</span> <span class="n">affine</span><span class="p">),</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;wm_mask.nii.gz&quot;</span><span class="p">)</span>
+    <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">gt</span><span class="p">[</span><span class="s2">&quot;fiber_fraction&quot;</span><span class="p">],</span> <span class="n">affine</span><span class="p">),</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;fiber_fraction.nii.gz&quot;</span><span class="p">)</span>
+    <span class="n">peaks</span> <span class="o">=</span> <span class="n">gt</span><span class="p">[</span><span class="s2">&quot;peaks&quot;</span><span class="p">]</span>
+    <span class="n">peaks_flat</span> <span class="o">=</span> <span class="n">peaks</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">peaks</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">nib</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">nib</span><span class="o">.</span><span class="n">Nifti1Image</span><span class="p">(</span><span class="n">peaks_flat</span><span class="p">,</span> <span class="n">affine</span><span class="p">),</span> <span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;peaks.nii.gz&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="symdwi.simulate.world_bvecs_to_fsl" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">symdwi</span><span class="o">.</span><span class="n">simulate</span><span class="o">.</span><span class="n">world_bvecs_to_fsl</span><span class="p">(</span><span class="n">bvecs</span><span class="p">,</span> <span class="n">affine</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Convert world-space gradient directions to FSL <code>.bvec</code> convention.</p>
+<p>SymDWI generates the signal using <code>bvecs</code> as directions in world (scanner)
+space. The on-disk <code>dwi.nii.gz</code> + <code>bvals</code>/<code>bvecs</code> triple is the FSL format,
+and tools that read it via the FSL convention (FSL itself, and MRtrix's
+<code>-fslgrad</code>) express gradients in the <em>image voxel</em> frame and additionally
+negate the first component when the voxel-to-world affine has a positive
+determinant (the "radiological" flip).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>bvecs</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="N">N</span>, 3))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Unit gradient directions in world space (b=0 rows may be zero).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>affine</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(4, 4))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The voxel-to-world affine the NIfTI is saved with.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="N">N</span>, 3))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Gradient directions in FSL <code>.bvec</code> convention.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>symdwi/simulate.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">world_bvecs_to_fsl</span><span class="p">(</span><span class="n">bvecs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">affine</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert world-space gradient directions to FSL `.bvec` convention.</span>
+
+<span class="sd">    SymDWI generates the signal using `bvecs` as directions in world (scanner)</span>
+<span class="sd">    space. The on-disk `dwi.nii.gz` + `bvals`/`bvecs` triple is the FSL format,</span>
+<span class="sd">    and tools that read it via the FSL convention (FSL itself, and MRtrix&#39;s</span>
+<span class="sd">    `-fslgrad`) express gradients in the *image voxel* frame and additionally</span>
+<span class="sd">    negate the first component when the voxel-to-world affine has a positive</span>
+<span class="sd">    determinant (the &quot;radiological&quot; flip).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bvecs : np.ndarray, shape (N, 3)</span>
+<span class="sd">        Unit gradient directions in world space (b=0 rows may be zero).</span>
+<span class="sd">    affine : np.ndarray, shape (4, 4)</span>
+<span class="sd">        The voxel-to-world affine the NIfTI is saved with.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray, shape (N, 3)</span>
+<span class="sd">        Gradient directions in FSL `.bvec` convention.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">affine</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">norms</span><span class="p">[</span><span class="n">norms</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">Rn</span> <span class="o">=</span> <span class="n">R</span> <span class="o">/</span> <span class="n">norms</span>
+    <span class="n">bvecs_vox</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">bvecs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="o">@</span> <span class="n">Rn</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">Rn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">bvecs_vox</span> <span class="o">=</span> <span class="n">bvecs_vox</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">bvecs_vox</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span>
+    <span class="k">return</span> <span class="n">bvecs_vox</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="symdwi.simulate.compute_signal" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">symdwi</span><span class="o">.</span><span class="n">simulate</span><span class="o">.</span><span class="n">compute_signal</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">density_frac</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">sphere</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tissue_masks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Compute DWI signal using the Standard Model (stick + zeppelin + ball).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>volume</code>
+            </td>
+            <td>
+                  <code><span title="collections.defaultdict">defaultdict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Sparse ODF grid from voxelise_bundles, with per-voxel direction
+probability distributions (must be normalised to sum to 1).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>density_frac</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Intra-axonal volume fraction per voxel key.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>params</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="symdwi.simulate.DWIParameters
+
+
+  
+      dataclass
+  " href="#symdwi.simulate.DWIParameters">DWIParameters</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bvals</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="N">N</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bvecs</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(<span title="N">N</span>, 3))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dims</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(3))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Volume dimensions.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sphere</code>
+            </td>
+            <td>
+                  <code>dipy Sphere</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Must match the sphere used to build <code>volume</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n_jobs</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of threads. Default 1.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>tissue_masks</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span> or None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>See simulate_dwi for details.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>verbose</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Verbosity level. 0 = silent, 1 = step prints, 2 = tqdm progress bar.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(*<span title="dims">dims</span>, <span title="N">N</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>symdwi/simulate.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
+<span class="normal">482</span>
+<span class="normal">483</span>
+<span class="normal">484</span>
+<span class="normal">485</span>
+<span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span>
+<span class="normal">494</span>
+<span class="normal">495</span>
+<span class="normal">496</span>
+<span class="normal">497</span>
+<span class="normal">498</span>
+<span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span>
+<span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_signal</span><span class="p">(</span>
+    <span class="n">volume</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">,</span>
+    <span class="n">density_frac</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">DWIParameters</span><span class="p">,</span>
+    <span class="n">bvals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">bvecs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">sphere</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">tissue_masks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute DWI signal using the Standard Model (stick + zeppelin + ball).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    volume : defaultdict</span>
+<span class="sd">        Sparse ODF grid from voxelise_bundles, with per-voxel direction</span>
+<span class="sd">        probability distributions (must be normalised to sum to 1).</span>
+<span class="sd">    density_frac : dict</span>
+<span class="sd">        Intra-axonal volume fraction per voxel key.</span>
+<span class="sd">    params : DWIParameters</span>
+<span class="sd">    bvals : np.ndarray, shape (N,)</span>
+<span class="sd">    bvecs : np.ndarray, shape (N, 3)</span>
+<span class="sd">    dims : np.ndarray, shape (3,)</span>
+<span class="sd">        Volume dimensions.</span>
+<span class="sd">    sphere : dipy Sphere</span>
+<span class="sd">        Must match the sphere used to build `volume`.</span>
+<span class="sd">    n_jobs : int</span>
+<span class="sd">        Number of threads. Default 1.</span>
+<span class="sd">    tissue_masks : dict or None</span>
+<span class="sd">        See simulate_dwi for details.</span>
+<span class="sd">    verbose : int</span>
+<span class="sd">        Verbosity level. 0 = silent, 1 = step prints, 2 = tqdm progress bar.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray, shape (*dims, N)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dwi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="o">*</span><span class="n">dims</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bvals</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">te_ms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">w_intra</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">params</span><span class="o">.</span><span class="n">te_ms</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">t2_intra_ms</span><span class="p">)</span>
+        <span class="n">w_extra</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">params</span><span class="o">.</span><span class="n">te_ms</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">t2_extra_ms</span><span class="p">)</span>
+        <span class="n">w_csf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">params</span><span class="o">.</span><span class="n">te_ms</span> <span class="o">/</span> <span class="n">params</span><span class="o">.</span><span class="n">t2_csf_ms</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">w_intra</span> <span class="o">=</span> <span class="n">w_extra</span> <span class="o">=</span> <span class="n">w_csf</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="n">water</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">bvals</span> <span class="o">*</span> <span class="n">params</span><span class="o">.</span><span class="n">d_iso</span><span class="p">)</span>
+    <span class="n">water_gm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">bvals</span> <span class="o">*</span> <span class="n">params</span><span class="o">.</span><span class="n">d_gm</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">background_csf</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">dwi</span> <span class="o">+=</span> <span class="n">params</span><span class="o">.</span><span class="n">background_csf</span> <span class="o">*</span> <span class="n">w_csf</span> <span class="o">*</span> <span class="n">water</span>
+
+    <span class="n">non_fiber_total</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">f_extra</span> <span class="o">+</span> <span class="n">params</span><span class="o">.</span><span class="n">f_csf</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">volume</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+    <span class="n">chunk_args</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">density_frac</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">bvals</span><span class="p">,</span> <span class="n">bvecs</span><span class="p">,</span> <span class="n">sphere</span><span class="p">,</span>
+        <span class="n">w_intra</span><span class="p">,</span> <span class="n">w_extra</span><span class="p">,</span> <span class="n">w_csf</span><span class="p">,</span> <span class="n">water</span><span class="p">,</span> <span class="n">water_gm</span><span class="p">,</span>
+        <span class="n">non_fiber_total</span><span class="p">,</span> <span class="n">dwi</span><span class="p">,</span> <span class="n">tissue_masks</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n_jobs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">wrapped</span> <span class="o">=</span> <span class="n">tqdm_mod</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;voxels&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;vox&quot;</span><span class="p">)</span>
+            <span class="n">_compute_voxel_chunk</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="o">*</span><span class="n">chunk_args</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_compute_voxel_chunk</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="o">*</span><span class="n">chunk_args</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_chunks</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">),</span> <span class="n">n_jobs</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">chunk_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">+</span> <span class="n">n_chunks</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">n_chunks</span><span class="p">)</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="p">[</span><span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">chunk_size</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">),</span> <span class="n">chunk_size</span><span class="p">)]</span>
+        <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">bar</span> <span class="o">=</span> <span class="n">tqdm_mod</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span>
+                    <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">chunks</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;chunks&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;chunk&quot;</span><span class="p">,</span>
+                    <span class="n">postfix</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;voxels&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)},</span>
+                <span class="p">)</span>
+                <span class="n">futs</span> <span class="o">=</span> <span class="p">{</span><span class="n">ex</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_compute_voxel_chunk</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="o">*</span><span class="n">chunk_args</span><span class="p">):</span> <span class="n">ch</span>
+                        <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">}</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">as_completed</span><span class="p">(</span><span class="n">futs</span><span class="p">):</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                    <span class="n">bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">futs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ex</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_compute_voxel_chunk</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="o">*</span><span class="n">chunk_args</span><span class="p">)</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">futs</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">dwi</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="symdwi.simulate.make_affine" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">symdwi</span><span class="o">.</span><span class="n">simulate</span><span class="o">.</span><span class="n">make_affine</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">)</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+        <p>Build a 4x4 voxel-to-world affine matrix.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>origin</code>
+            </td>
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(3))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>World-space coordinates of voxel (0, 0, 0) in mm.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>voxel_size</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Isotropic voxel size in mm.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>(<span title="numpy.ndarray">ndarray</span>, <span title="shape">shape</span>(4, 4))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>symdwi/simulate.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_affine</span><span class="p">(</span><span class="n">origin</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">voxel_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a 4x4 voxel-to-world affine matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    origin : np.ndarray, shape (3,)</span>
+<span class="sd">        World-space coordinates of voxel (0, 0, 0) in mm.</span>
+<span class="sd">    voxel_size : float</span>
+<span class="sd">        Isotropic voxel size in mm.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray, shape (4, 4)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">aff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">aff</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">aff</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">aff</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">voxel_size</span>
+    <span class="n">aff</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">aff</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
