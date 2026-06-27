@@ -49,6 +49,8 @@ pip install -e ".[dev]"
 pytest
 ```
 ## Documentation
+Documentation is available [here](https://antonio-dimeglio.github.io/SymDWI/), or alternatively,
+can be deployed locally by doing 
 
 ```bash
 pip install -e ".[dev]"
