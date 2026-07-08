@@ -14,6 +14,11 @@ For 3D bundle visualisation (requires [FURY](https://fury.gl)):
 pip install -e ".[vis]"
 ```
 
+For GUI usage
+```
+pip install -e ".[gui]"
+```
+
 ## Quick start
 
 ```python
