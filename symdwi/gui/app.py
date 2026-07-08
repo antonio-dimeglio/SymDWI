@@ -88,7 +88,9 @@ class MainWindow(QMainWindow):
         self._sim_result = None
         self._sim_groundtruth = None
         self._sim_bundles = None
-        
+        self._editing_index = None
+        self._editing_color = None
+
         self._ref_origin = None
         self._ref_dims = None
         self._ref_voxel_size = None
@@ -179,6 +181,7 @@ class MainWindow(QMainWindow):
         sp.bundle_list.edit_btn.clicked.connect(self._on_edit_bundle)
         sp.bundle_list.delete_btn.clicked.connect(self._on_delete_bundle)
         sp.bundle_list.visibility_changed.connect(self._on_bundle_visibility_changed)
+        sp.bundle_list.bundle_deleted.connect(self._on_bundle_deleted)
 
 
     def _add_shortcuts(self):
@@ -304,25 +307,40 @@ class MainWindow(QMainWindow):
             )
             return
 
+        editing = self._editing_index is not None
+        if editing:
+            color = self._editing_color
+        else:
+            color = _BUNDLE_COLORS[len(self.scene.bundles) % len(_BUNDLE_COLORS)]
+
         cfg = BundleConfig(
             control_points=[list(p) for p in pts],
             radius=cfg.radius,
             n_streamlines=cfg.n_streamlines,
             dispersion=cfg.dispersion,
             taper=cfg.taper,
-            color=_BUNDLE_COLORS[len(self.scene.bundles) % len(_BUNDLE_COLORS)],
+            color=color,
         )
-        self.scene.bundles.append(cfg)
 
-        bundle = symdwi.Bundle(
-            control_points=np.array(cfg.control_points, dtype=float),
-            n_streamlines=cfg.n_streamlines,
-            radius=cfg.radius,
-            dispersion=cfg.dispersion,
-            taper=(lambda u: 1 - u) if cfg.taper else None,
-        )
+        if editing:
+            self.scene.bundles.insert(self._editing_index, cfg)
+            self._editing_index = None
+            self._editing_color = None
+        else:
+            self.scene.bundles.append(cfg)
+
         self.view3d.clear_preview()
-        self.view3d.add_bundle(bundle.as_array(), color=cfg.color)
+        if editing:
+            self._rebuild_3d_bundles()
+        else:
+            bundle = symdwi.Bundle(
+                control_points=np.array(cfg.control_points, dtype=float),
+                n_streamlines=cfg.n_streamlines,
+                radius=cfg.radius,
+                dispersion=cfg.dispersion,
+                taper=(lambda u: 1 - u) if cfg.taper else None,
+            )
+            self.view3d.add_bundle(bundle.as_array(), color=cfg.color)
 
         self.sidebar.bundle_list.refresh()
 
@@ -333,6 +351,8 @@ class MainWindow(QMainWindow):
 
     def on_new_bundle(self):
         """Clear active points to start placing a new bundle."""
+        self._editing_index = None
+        self._editing_color = None
         self.scene.active_points.clear()
         self.view3d.clear_preview()
         self._redraw_2d_active()
@@ -510,6 +530,8 @@ class MainWindow(QMainWindow):
         self._redraw_2d_active()
         self._sync_points_to_table()
 
+        self._editing_index = idx
+        self._editing_color = cfg.color
         self.scene.bundles.pop(idx)
         self._rebuild_3d_bundles()
         self._redraw_2d_bundles()
@@ -518,6 +540,12 @@ class MainWindow(QMainWindow):
     def _on_delete_bundle(self):
         self._rebuild_3d_bundles()
         self._redraw_2d_bundles()
+
+    def _on_bundle_deleted(self, deleted_row: int):
+        """Keep the pending edit's reinsertion point correct if a bundle is
+        deleted from the list while another bundle is being edited."""
+        if self._editing_index is not None and deleted_row < self._editing_index:
+            self._editing_index -= 1
 
     def _rebuild_3d_bundles(self):
         """Redraw all visible confirmed bundles from scratch."""

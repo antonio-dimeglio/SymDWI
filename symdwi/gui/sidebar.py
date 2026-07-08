@@ -72,6 +72,7 @@ class VolumePanel(QGroupBox):
 
 class BundleListPanel(QGroupBox):
     visibility_changed = Signal()
+    bundle_deleted = Signal(int)
 
     def __init__(self, scene: Scene, parent=None):
         super().__init__("Bundles", parent)
@@ -126,6 +127,7 @@ class BundleListPanel(QGroupBox):
             return
         self.scene.bundles.pop(idx)
         self.refresh()
+        self.bundle_deleted.emit(idx)
 
 
 class BundleParamsPanel(QGroupBox):
@@ -144,7 +146,7 @@ class BundleParamsPanel(QGroupBox):
         form.addRow("Radius (mm)", self.radius)
 
         self.n_streamlines = QSpinBox()
-        self.n_streamlines.setRange(1, 1000)
+        self.n_streamlines.setRange(1, 100000)
         self.n_streamlines.setValue(100)
         form.addRow("Streamlines", self.n_streamlines)
 

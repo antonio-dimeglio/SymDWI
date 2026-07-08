@@ -45,6 +45,10 @@ symdwi.save_dwi(dwi, affine, bvals, bvecs, "output/")
 symdwi.save_bundles([bundle], "output/tractogram.tck")
 ```
 
+To run the gui, after installation into a venv (we suggest using uv for simplicity) the following command can be used:
+```bash
+symdwi-gui
+```
 ## Tests
 
 The test suite (and other developer tooling) lives in the `dev` extra:
