@@ -351,7 +351,7 @@ def simulate_dwi(
         sigma = s0 / snr
         r = rng.normal(loc=0, scale=sigma, size=signal.shape)
         i = rng.normal(loc=0, scale=sigma, size=signal.shape)
-        signal = np.sqrt((signal + r) ** 2 + i ** 2)
+        signal = np.sqrt((signal + r) ** 2 + i ** 2).astype(np.float32)
 
     if verbose >= 1:
         print("Done.")
@@ -582,11 +582,11 @@ def compute_signal(
 
     Returns
     -------
-    np.ndarray, shape (*dims, N)
+    np.ndarray, shape (*dims, N), dtype float32
     """
     gm = gm if gm is not None else DEFAULT_GM_PARAMETERS
 
-    dwi = np.zeros((*dims, len(bvals)))
+    dwi = np.zeros((*dims, len(bvals)), dtype=np.float32)
 
     water = np.exp(-bvals * scan.d_iso)
 
@@ -745,7 +745,7 @@ def save_dwi(
         Gradient pulse duration delta (ms). See big_delta_ms.
     """
     p = Path(path)
-    img = nib.Nifti1Image(signal, affine)
+    img = nib.Nifti1Image(np.asarray(signal, dtype=np.float32), affine)
     nib.save(img, p / "dwi.nii.gz")
 
     if to_fsl:
