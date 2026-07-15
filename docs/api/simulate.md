@@ -1,6 +1,8 @@
 # Simulate
 
-::: symdwi.simulate.DWIParameters
+::: symdwi.simulate.ScanParameters
+
+::: symdwi.simulate.GMParameters
 
 ::: symdwi.simulate.simulate_dwi
 

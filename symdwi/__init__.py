@@ -1,8 +1,9 @@
 """SymDWI — synthetic diffusion MRI phantom library."""
 
-from .bundle import Bundle, save_bundles
+from .bundle import Bundle, BundleGeometry, TissueParameters, save_bundles
 from .simulate import (
-    DWIParameters,
+    ScanParameters,
+    GMParameters,
     simulate_dwi,
     compute_signal,
     extract_groundtruth,
@@ -12,11 +13,15 @@ from .simulate import (
     world_bvecs_to_fsl,
     generate_bvals_bvecs,
 )
+from .gm_compartments import gpd_sphere_attenuation, isotropic_stick_attenuation
 
 __all__ = [
     "Bundle",
+    "BundleGeometry",
+    "TissueParameters",
     "save_bundles",
-    "DWIParameters",
+    "ScanParameters",
+    "GMParameters",
     "simulate_dwi",
     "compute_signal",
     "extract_groundtruth",
@@ -25,4 +30,6 @@ __all__ = [
     "save_groundtruth",
     "world_bvecs_to_fsl",
     "generate_bvals_bvecs",
+    "gpd_sphere_attenuation",
+    "isotropic_stick_attenuation",
 ]

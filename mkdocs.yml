@@ -19,6 +19,7 @@ nav:
   - API Reference:
     - Bundle: api/bundle.md
     - Simulate: api/simulate.md
+    - GM Compartments: api/gm_compartments.md
   - Examples:
     - Basic Phantom: examples/basic_phantom.md
     - BundleSeg Full-Brain: examples/bundleseg_phantom.md

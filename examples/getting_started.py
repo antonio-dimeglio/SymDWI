@@ -14,14 +14,14 @@ b1_pts = np.array([
     [50, 10, 30]
 ])
 
-b1 = symdwi.Bundle(
+b1 = symdwi.Bundle(symdwi.BundleGeometry(
     b1_pts,
     n_streamlines=500,
     radius=3.0,
     n_samples=100,
     degree=3,
     dispersion=0.25
-)
+))
 
 
 b2_pts = np.array([
@@ -34,23 +34,23 @@ b2_pts = np.array([
     [53, 40, 30]
 ])
 
-b2 = symdwi.Bundle(
+b2 = symdwi.Bundle(symdwi.BundleGeometry(
     b2_pts,
     n_streamlines=500,
     radius=3.0,
     n_samples=100,
     degree=3,
     dispersion=0.25
-)
+))
 
 
 bvals, bvecs = symdwi.generate_bvals_bvecs(shells=[(1000, 8), (2000, 8), (3000, 8)], n_b0=1)
 
-params = symdwi.DWIParameters(
-    f_intra=0.7,
-    f_extra=0.3,
-    f_csf=0.0,
-    axon_radius_um=1.0,
+tissue = symdwi.TissueParameters(
+    f_csf_split=0.0,
+    axon_radius=1.0,
+)
+scan = symdwi.ScanParameters(
     te_ms=80.0,
     background_csf=0.00,
 )
@@ -59,7 +59,8 @@ dwi, affine, gt = symdwi.simulate_dwi(
     [b1, b2],
     bvals,
     bvecs,
-    params,
+    scan,
+    tissue=tissue,
     origin=np.array([0.0, 0.0, 0.0]),
     dims=dims,
     voxel_size=voxel_size,

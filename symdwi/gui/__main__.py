@@ -1,3 +1,7 @@
+"""Entry point for launching the SymDWI GUI application.
+
+Run via ``python -m symdwi.gui``.
+"""
 import os
 import sys
 
@@ -10,9 +14,16 @@ if sys.platform.startswith("linux") and "QT_QPA_PLATFORM" not in os.environ:
 
 from PySide6.QtWidgets import QApplication
 from symdwi.gui.app import MainWindow
+from symdwi.gui.theme import STYLESHEET
 
 def main():
+    """Create the Qt application, apply the theme, and show the main window.
+
+    Blocks until the application event loop exits, then terminates the
+    process with the resulting Qt exit code.
+    """
     app = QApplication(sys.argv)
+    app.setStyleSheet(STYLESHEET)
     win = MainWindow()
     win.show()
     sys.exit(app.exec())

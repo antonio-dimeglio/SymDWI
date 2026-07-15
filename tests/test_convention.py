@@ -15,6 +15,7 @@ def _angle_field(a, b):
 
 
 def test_identity_affine_flips_x_only():
+    # Positive-determinant affine negates only the x component of each bvec.
     aff = make_affine(np.zeros(3), 1.0)
     bvecs = np.array([[0, 0, 0], [1, 0, 0], [0.5, 0.5, np.sqrt(0.5)], [0, 1, 0]], float)
     out = world_bvecs_to_fsl(bvecs, aff)
@@ -23,6 +24,7 @@ def test_identity_affine_flips_x_only():
 
 
 def test_convention_is_an_involution_for_axis_aligned_affine():
+    # Applying the FSL conversion twice must return the original world bvecs.
     aff = make_affine(np.array([10.0, -5.0, 3.0]), 2.0)
     rng = np.random.default_rng(0)
     bvecs = rng.normal(size=(20, 3))
@@ -32,12 +34,15 @@ def test_convention_is_an_involution_for_axis_aligned_affine():
 
 
 def test_save_dwi_writes_fsl_convention(tmp_path):
+    # bvecs.txt written by save_dwi must match world_bvecs_to_fsl's output, not raw world bvecs.
     pts = np.array([[10, 10, 18], [15, 15, 18], [20, 20, 18]], float)
-    b = symdwi.Bundle(pts, n_streamlines=120, radius=4.0, dispersion=0.2, seed=0)
+    geom = symdwi.BundleGeometry(pts, n_streamlines=120, radius=4.0, dispersion=0.2, seed=0)
+    b = symdwi.Bundle(geom)
     bvals, bvecs = symdwi.generate_bvals_bvecs(shells=[(1000, 30)], n_b0=2, seed=1)
-    params = symdwi.DWIParameters(te_ms=80.0, axon_radius_um=1.0)
+    scan = symdwi.ScanParameters(te_ms=80.0)
+    tissue = symdwi.TissueParameters(axon_radius=1.0)
     signal, affine = symdwi.simulate_dwi(
-        [b], bvals, bvecs, params, origin=np.zeros(3), dims=(30, 30, 36),
+        [b], bvals, bvecs, scan, tissue=tissue, origin=np.zeros(3), dims=(30, 30, 36),
         voxel_size=1.0, snr=None, sphere="repulsion100",
     )
     symdwi.save_dwi(signal, affine, bvals, bvecs, tmp_path)
@@ -49,19 +54,19 @@ def test_save_dwi_writes_fsl_convention(tmp_path):
 
 
 def test_oblique_bundle_reconstructs_to_groundtruth_via_fsl_bvecs(tmp_path):
-    """End-to-end: an FSL-aware consumer of the saved files recovers the true
-    orientation of an OBLIQUE bundle. If save_dwi drops the radiological flip,
-    the consumer's gradients mirror in x and the DTI peak lands ~90 deg off.
-    """
+    # End-to-end: an FSL-aware consumer of the saved files must recover the true
+    # orientation of an oblique bundle, not a mirrored one from a dropped flip.
     from dipy.core.gradients import gradient_table
     from dipy.reconst.dti import TensorModel
 
     pts = np.array([[6, 6, 18], [14, 14, 18], [22, 22, 18]], float)
-    b = symdwi.Bundle(pts, n_streamlines=300, radius=5.0, dispersion=0.2, seed=0)
+    geom = symdwi.BundleGeometry(pts, n_streamlines=300, radius=5.0, dispersion=0.2, seed=0)
+    b = symdwi.Bundle(geom)
     bvals, bvecs = symdwi.generate_bvals_bvecs(shells=[(1000, 40)], n_b0=4, seed=1)
-    params = symdwi.DWIParameters(f_intra=0.7, f_extra=0.3, te_ms=80.0, axon_radius_um=1.0)
+    scan = symdwi.ScanParameters(te_ms=80.0)
+    tissue = symdwi.TissueParameters(axon_radius=1.0)
     signal, affine, gt = symdwi.simulate_dwi(
-        [b], bvals, bvecs, params, origin=np.zeros(3), dims=(30, 30, 36),
+        [b], bvals, bvecs, scan, tissue=tissue, origin=np.zeros(3), dims=(30, 30, 36),
         voxel_size=1.0, snr=None, sphere="repulsion724", return_groundtruth=True,
     )
     symdwi.save_dwi(signal, affine, bvals, bvecs, tmp_path)

@@ -4,20 +4,113 @@ from dipy.io.streamline import save_tractogram
 from dipy.io.stateful_tractogram import StatefulTractogram, Space
 from nibabel.streamlines import Tractogram
 import nibabel as nib
+from dataclasses import dataclass
+
+
+@dataclass
+class BundleGeometry:
+    """
+    Geometrical properties of a bundle.
+
+    Parameters
+    ----------
+    control_points : np.ndarray, shape (N, 3)
+        3D points the centerline passes through.
+    n_streamlines : int
+        Number of streamlines in the bundle.
+    radius : float
+        Thickness of the bundle (max offset of streamlines from center).
+    n_samples : int
+        Number of points sampled along each streamline.
+    degree : int
+        Spline degree (3 = cubic).
+    smoothing : float
+        How strictly the centerline hits the control points (0 = exact).
+    taper : callable or None
+        Optional function controlling how radius varies along the bundle.
+    dispersion : float
+        Std-dev of per-control-point wander (same units as coordinates).
+        Controls how much fibers drift from a perfectly parallel tube.
+    seed : int or None
+        RNG seed.
+    """
+    control_points: np.ndarray
+    n_streamlines: int = 1000
+    radius: float = 2.0
+    n_samples: int = 128
+    degree: int = 3
+    smoothing: float = 0.0
+    taper: object = None
+    dispersion: float = 0.0
+    seed: int | None = None
+
+    def __post_init__(self):
+        self.control_points = np.asarray(self.control_points, dtype=float)
+        assert self.control_points.shape[1] == 3, "Cannot use non 3D set of points."
+
+
+@dataclass
+class TissueParameters:
+    """
+    Standard Model compartment description for one or multiple bundles.
+    Parameters
+    ----------
+    f_csf_split : float
+        Fraction of non-axonal voxel space attributed to free
+        water (CSF) rather than extra-axonal water, in pure-fiber voxels with
+        no CSF tissue mask contribution. Must satisfy 0 <= f_csf_split <= 1.
+    di_axial : float
+        Intra-axonal axial diffusivity (mm^2/s).
+    de_axial : float
+        Extra-axonal axial diffusivity (mm^2/s).
+    de_radial : float
+        Extra-axonal radial diffusivity (mm^2/s).
+    axon_radius : float or None
+        Effective packing-density calibration radius, in micrometers. Converts
+        streamline point density to a *relative* intra-axonal volume fraction.
+        Set to None for uncalibrated (raw count) relative density scaling.
+    t2_intra_ms : float
+        T2 relaxation time for the intra-axonal compartment (ms).
+    t2_extra_ms : float
+        T2 relaxation time for the extra-axonal compartment (ms).
+    t2_myelin_ms : float
+        T2 relaxation time for the short-T2 myelin-water pool (ms). Only
+        contributes to the signal when f_myelin > 0.
+    f_myelin : float
+        Fraction of the intra-axonal-adjacent signal reassigned to the
+        myelin-water pool.
+    """
+
+    f_csf_split: float = 0.0
+
+    di_axial: float = 1.7e-3
+    de_axial: float = 1.7e-3
+    de_radial: float = 0.5e-3
+
+    axon_radius: float | None = 1.0
+
+    t2_intra_ms: float = 70.0
+    t2_extra_ms: float = 70.0
+    t2_myelin_ms: float = 15.0
+    f_myelin: float = 0.0
+
+    def __post_init__(self):
+        assert 0.0 <= self.f_csf_split <= 1.0, (
+            f"f_csf_split must be in [0, 1], got {self.f_csf_split}"
+        )
+        assert 0.0 <= self.f_myelin <= 1.0, (
+            f"f_myelin must be in [0, 1], got {self.f_myelin}"
+        )
+
+
+DEFAULT_TISSUE_PARAMETERS = TissueParameters()
 
 
 class Bundle:
     def __init__(
         self,
-        control_points: np.ndarray,
-        n_streamlines: int = 100,
-        radius: float = 2.0,
-        n_samples: int = 100,
-        degree: int = 3,
-        smoothing: float = 0.0,
-        taper=None,
-        dispersion: float = 0.0,
-        seed: int | None = None,
+        geometry: BundleGeometry,
+        tissue: TissueParameters | None = None,
     ):
         """
         Fiber bundle modeled via B-splines.
@@ -32,41 +125,31 @@ class Bundle:
 
         Parameters
         ----------
-        control_points : np.ndarray, shape (N, 3)
-            3D points the centerline passes through.
-        n_streamlines : int
-            Number of streamlines in the bundle.
-        radius : float
-            Thickness of the bundle (max offset of streamlines from center).
-        n_samples : int
-            Number of points sampled along each streamline.
-        degree : int
-            Spline degree (3 = cubic).
-        smoothing : float
-            How strictly the centerline hits the control points (0 = exact).
-        taper : callable or None
-            Optional function controlling how radius varies along the bundle.
-        dispersion : float
-            Std-dev of per-control-point wander (same units as coordinates).
-            Controls how much fibers drift from a perfectly parallel tube.
-        seed : int or None
-            RNG seed.
+        geometry : BundleGeometry
+            The bundle's shape in space.
+        tissue : TissueParameters or None
+            Per-bundle override of the Standard Model tissue parameters. If
+            None, the bundle falls back to whatever default `TissueParameters`
+            the simulation is run with.
         """
-        self.control_points = np.asarray(control_points, dtype=float)
-        assert self.control_points.shape[1] == 3, "Cannot use non 3D set of points."
-        self.n_streamlines = n_streamlines
-        self.radius = radius
-        self.n_samples = n_samples
-        self.degree = degree
-        self.smoothing = smoothing
-        self.taper = taper
-        self.dispersion = dispersion
-        self.rng = np.random.default_rng(seed)
+        self.geometry = geometry
+        self.tissue = tissue
+
+        self.control_points = geometry.control_points
+        self.n_streamlines = geometry.n_streamlines
+        self.radius = geometry.radius
+        self.n_samples = geometry.n_samples
+        self.degree = geometry.degree
+        self.smoothing = geometry.smoothing
+        self.taper = geometry.taper
+        self.dispersion = geometry.dispersion
+        self.rng = np.random.default_rng(geometry.seed)
 
         self._build_bundle()
 
     @classmethod
-    def from_tck(cls, path: str, n_samples: int = 100) -> "Bundle":
+    def from_tck(cls, path: str, n_samples: int = 100,
+                 tissue: TissueParameters | None = None) -> "Bundle":
         """
         Load a bundle from a .tck tractogram file.
 
@@ -79,6 +162,8 @@ class Bundle:
             Path to a .tck file.
         n_samples : int
             Number of points to resample each streamline to.
+        tissue : TissueParameters or None
+            Per-bundle override of the Standard Model tissue parameters.
 
         Returns
         -------
@@ -112,6 +197,8 @@ class Bundle:
         if not streamlines:
             raise ValueError(f"No valid streamlines found in {path}")
         b = cls.__new__(cls)
+        b.geometry = None
+        b.tissue = tissue
         b.streamlines = streamlines
         b.tangents = tangents
         b.n_streamlines = len(streamlines)

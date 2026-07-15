@@ -2,10 +2,11 @@ from pathlib import Path
 import nibabel as nib
 import numpy as np
 from symdwi import (
-    Bundle, 
-    simulate_dwi, 
+    Bundle,
+    simulate_dwi,
     generate_bvals_bvecs,
-    DWIParameters,
+    ScanParameters,
+    GMParameters,
     save_dwi
 )
 
@@ -42,7 +43,8 @@ dwi, affine = simulate_dwi(
     bundles=bundles,
     bvals=bvals,
     bvecs=bvecs,
-    params=DWIParameters(),
+    scan=ScanParameters(),
+    gm=GMParameters(),
     origin=origin,
     dims=dims,
     voxel_size=voxel_size,

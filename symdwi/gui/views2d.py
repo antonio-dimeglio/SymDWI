@@ -1,3 +1,13 @@
+"""2D orthogonal slice view widget for the SymDWI scene-building GUI.
+
+Provides :class:`OrthoView`, a Matplotlib-backed Qt widget that renders a
+single axial, coronal, or sagittal slice through the simulation volume. It
+can optionally overlay a baseline T1/T2 background image, draw projected
+fiber bundle control points, and let the user pick new 3D points by
+clicking on the plane. Mouse wheel, drag-pan, and drag-zoom navigation are
+implemented directly on top of the Matplotlib canvas events.
+"""
+
 import numpy as np
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QSlider, QApplication
 from PySide6.QtCore import Signal, Qt
@@ -5,10 +15,28 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.patches import Rectangle
 
+from symdwi.gui.theme import BG_0, BG_1
+
 
 class OrthoView(QWidget):
+    """Single-plane orthogonal slice view of the simulation volume.
+
+    Renders one of the three canonical planes (axial, coronal, sagittal) of
+    the volume using a Matplotlib canvas embedded in a Qt widget, with a
+    slider to move through slices, an optional grayscale baseline image
+    background, and overlays for confirmed bundles, active in-progress
+    control points, and picked dots. Supports scroll-to-zoom/slice, and
+    middle/right mouse drag for pan/zoom navigation.
+
+    Signals:
+        point_picked (str, float, float, float): Emitted on a left-click in
+            the plot area with the plane name and the picked point as
+            ``(u, v, slice_mm)`` in world millimeter coordinates.
+    """
+
     point_picked = Signal(str, float, float, float)
 
+    #: Axis labels (x_label, y_label) for each supported plane.
     _PLANE_LABELS = {
         "axial":    ("X (mm)", "Y (mm)"),
         "coronal":  ("X (mm)", "Z (mm)"),
@@ -16,6 +44,15 @@ class OrthoView(QWidget):
     }
 
     def __init__(self, plane: str, parent=None):
+        """Build the Matplotlib canvas, slider, and event wiring for a plane.
+
+        Args:
+            plane: One of ``"axial"``, ``"coronal"``, ``"sagittal"``.
+            parent: Optional parent widget.
+
+        Raises:
+            AssertionError: If ``plane`` is not a recognized plane name.
+        """
         super().__init__(parent)
         assert plane in self._PLANE_LABELS, f"Unknown plane: {plane}"
         self.plane = plane
@@ -35,7 +72,7 @@ class OrthoView(QWidget):
         self._nav = None
 
         fig = Figure(figsize=(3, 3), tight_layout=True)
-        fig.patch.set_facecolor("#1e1e1e")
+        fig.patch.set_facecolor(BG_0)
         self.canvas = FigureCanvas(fig)
         self.ax = fig.add_subplot(111)
         self._style_axes()
@@ -57,7 +94,8 @@ class OrthoView(QWidget):
         self._draw()
 
     def _style_axes(self):
-        self.ax.set_facecolor("#2d2d2d")
+        """Apply the dark theme colors and axis labels/title to ``self.ax``."""
+        self.ax.set_facecolor(BG_1)
         for spine in self.ax.spines.values():
             spine.set_edgecolor("#555555")
         self.ax.tick_params(colors="#aaaaaa", labelsize=7)
@@ -68,6 +106,17 @@ class OrthoView(QWidget):
 
     def set_volume(self, x_mm: float, y_mm: float, z_mm: float, voxel_size: float = None,
                    origin=None):
+        """Update the volume extent/voxel size/origin and redraw.
+
+        Args:
+            x_mm: Volume extent along X, in millimeters.
+            y_mm: Volume extent along Y, in millimeters.
+            z_mm: Volume extent along Z, in millimeters.
+            voxel_size: Isotropic voxel size in millimeters. If falsy,
+                the existing voxel size is kept.
+            origin: Optional 3-tuple world-mm origin (voxel-0 centre). If
+                None, the existing origin is kept.
+        """
         self._vol = (x_mm, y_mm, z_mm)
         if voxel_size:
             self._voxel = float(voxel_size)
@@ -97,14 +146,21 @@ class OrthoView(QWidget):
         return {"axial": z, "coronal": y, "sagittal": x}[self.plane]
 
     def _slice_count_volume(self) -> int:
-        """Number of slices implied by the volume grid (no baseline loaded)."""
+        """Number of slices implied by the volume grid (no baseline loaded).
+
+        Returns:
+            Slice count, at least 1.
+        """
         if self._voxel <= 0:
             return 1
         return max(1, int(self._outplane_mm() / self._voxel))
 
     def _update_slider_range(self):
         """Configure the slider from the volume grid when no baseline is loaded.
-        With a baseline, set_background owns the slider range."""
+
+        With a baseline loaded, :meth:`set_background` owns the slider range
+        instead and this is a no-op.
+        """
         if self._bg_data is not None:
             return
         n = self._slice_count_volume()
@@ -117,11 +173,20 @@ class OrthoView(QWidget):
         self._slider.show()
 
     def current_slice_mm(self) -> float:
-        """Out-of-plane world position (mm) of the current slice."""
+        """Out-of-plane world position (mm) of the current slice.
+
+        Returns:
+            World mm coordinate along the axis this plane slices through.
+        """
         return self._outplane_origin() + self._slice_idx * self._voxel
 
     def set_slice_mm(self, mm: float):
-        """Move the slider to the slice containing the given world mm position."""
+        """Move the slider to the slice containing the given world mm position.
+
+        Args:
+            mm: Target world mm coordinate along the out-of-plane axis. No-op
+                if the voxel size is not positive.
+        """
         if self._voxel <= 0:
             return
         n = (self._slice_axis_len() if self._bg_data is not None
@@ -137,15 +202,21 @@ class OrthoView(QWidget):
         self._draw()
 
     def set_active_points(self, points: list):
-        """Update the projected overlay of resolved 3D control points."""
+        """Update the projected overlay of resolved 3D control points.
+
+        Args:
+            points: List of 3D ``[x, y, z]`` points for the bundle currently
+                being built.
+        """
         self._active_points = list(points)
         self._draw()
 
     def set_bundles(self, bundles: list):
         """Set the semi-transparent overlays of confirmed bundles.
 
-        ``bundles`` is a list of (control_points, color) for every bundle that
-        should be shown, projected onto this plane.
+        Args:
+            bundles: List of ``(control_points, color)`` pairs for every
+                confirmed bundle to display, projected onto this plane.
         """
         self._bundles = list(bundles)
         self._draw()
@@ -154,8 +225,12 @@ class OrthoView(QWidget):
         """
         Set (or clear) the baseline T1/T2 volume shown behind the drawing.
 
-        ``data`` is a 3D array in canonical RAS voxel order (nx, ny, nz),
-        or None to remove the background.
+        Recomputes the slice slider range and intensity color limits (1st and
+        99th percentile of finite voxel values) for the new volume.
+
+        Args:
+            data: 3D array in canonical RAS voxel order ``(nx, ny, nz)``, or
+                None to remove the background image.
         """
         self._bg_data = data
         self._view_limits = None
@@ -182,17 +257,29 @@ class OrthoView(QWidget):
         self._draw()
 
     def _slice_axis_len(self):
-        """Length of the volume axis this plane slices through."""
+        """Length of the volume axis this plane slices through.
+
+        Returns:
+            Number of voxels along the out-of-plane axis of ``self._bg_data``,
+            or 0 if no background is loaded.
+        """
         if self._bg_data is None:
             return 0
         nx, ny, nz = self._bg_data.shape[:3]
         return {"axial": nz, "coronal": ny, "sagittal": nx}[self.plane]
 
     def _slice_count(self):
+        """Number of slices along the out-of-plane axis of the background volume."""
         return self._slice_axis_len()
 
     def _current_slice(self):
-        """Return the 2D slice (rows=v, cols=u) for the current index."""
+        """Return the 2D slice (rows=v, cols=u) for the current index.
+
+        Returns:
+            numpy.ndarray: 2D array extracted and transposed from the 3D
+            background volume so rows correspond to the plane's ``v`` axis
+            and columns to its ``u`` axis, matching ``imshow`` conventions.
+        """
         data = self._bg_data
         n = self._slice_axis_len()
         k = int(np.clip(self._slice_idx, 0, n - 1))
@@ -203,10 +290,21 @@ class OrthoView(QWidget):
         return data[k, :, :].T
 
     def _on_slice_change(self, value):
+        """Slot for the slider's ``valueChanged`` signal: update slice index and redraw.
+
+        Args:
+            value: New slider value (slice index).
+        """
         self._slice_idx = value
         self._draw()
 
     def _on_scroll(self, event):
+        """Matplotlib scroll-event handler: Ctrl+scroll zooms, plain scroll changes slice.
+
+        Args:
+            event: Matplotlib ``MouseEvent`` with ``xdata``/``ydata`` (data
+                coordinates under the cursor) and ``button`` (``"up"``/``"down"``).
+        """
         ctrl = bool(QApplication.keyboardModifiers() & Qt.ControlModifier)
         if ctrl and event.xdata is not None and event.ydata is not None:
             factor = 0.8 if event.button == "up" else 1.25

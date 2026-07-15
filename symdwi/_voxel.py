@@ -37,7 +37,7 @@ def voxelise_bundles(
     sphere=get_sphere(name="repulsion724"),
 ) -> defaultdict:
     """
-    Voxelise a list of bundles into a sparse ODF histogram grid.
+    Voxelise a list of bundles into a sparse, per-bundle ODF histogram grid.
 
     Parameters
     ----------
@@ -53,22 +53,22 @@ def voxelise_bundles(
 
     Returns
     -------
-    defaultdict mapping (i, j, k) -> np.ndarray, shape (n_dirs,)
-        Streamline-point counts per direction bin per voxel.
+    defaultdict mapping (i, j, k) -> dict[int, np.ndarray]
+        Streamline-point counts per direction bin, per voxel, per contributing
+        bundle. The inner dict maps a bundle's index in `bundles` to its
+        direction histogram (shape (n_dirs,)) for that voxel. 
     """
     dims_arr = np.array(dims)
     n_dirs = len(sphere.vertices)
     verts = sphere.vertices
 
     origin = np.asarray(origin, dtype=float)
-    flat_voxels = []
-    dir_bins = []
 
-    # Densify each streamline so consecutive samples are spaced below one voxel,
-    # otherwise a thin/curved fiber can step over a voxel without any sample
-    # landing inside it, leaving signal holes. Done per streamline so we never
-    # interpolate across the gap between two separate streamlines.
-    for b in bundles:
+    grid = defaultdict(dict)
+
+    for bundle_idx, b in enumerate(bundles):
+        flat_voxels = []
+        dir_bins = []
         for line, tang in zip(b.streamlines, b.tangents):
             pts, tng = _densify(np.asarray(line, dtype=float),
                                 np.asarray(tang, dtype=float), voxel_size)
@@ -80,22 +80,26 @@ def voxelise_bundles(
             flat_voxels.append(np.ravel_multi_index(idx.T, dims))
             dir_bins.append(directions_to_bins(tng, verts))
 
-    grid = defaultdict(lambda: np.zeros(n_dirs))
-    if not flat_voxels:
-        return grid
+        if not flat_voxels:
+            continue
 
-    flat_voxels = np.concatenate(flat_voxels)
-    dir_bins = np.concatenate(dir_bins)
+        flat_voxels = np.concatenate(flat_voxels)
+        dir_bins = np.concatenate(dir_bins)
 
-    combined = flat_voxels * n_dirs + dir_bins
-    uniq, counts = np.unique(combined, return_counts=True)
+        combined = flat_voxels * n_dirs + dir_bins
+        uniq, counts = np.unique(combined, return_counts=True)
 
-    uniq_voxel = uniq // n_dirs
-    uniq_dir = uniq % n_dirs
+        uniq_voxel = uniq // n_dirs
+        uniq_dir = uniq % n_dirs
 
-    voxel_ijk = np.array(np.unravel_index(uniq_voxel, dims)).T
-    for (i, j, k), d, c in zip(map(tuple, voxel_ijk), uniq_dir, counts):
-        grid[(i, j, k)][d] = c
+        voxel_ijk = np.array(np.unravel_index(uniq_voxel, dims)).T
+        for (i, j, k), d, c in zip(map(tuple, voxel_ijk), uniq_dir, counts):
+            key = (i, j, k)
+            hist = grid[key].get(bundle_idx)
+            if hist is None:
+                hist = np.zeros(n_dirs)
+                grid[key][bundle_idx] = hist
+            hist[d] = c
 
     return grid
 
@@ -103,10 +107,7 @@ def voxelise_bundles(
 def _densify(pts: np.ndarray, tng: np.ndarray, voxel_size: float) -> tuple[np.ndarray, np.ndarray]:
     """
     Insert samples along a single streamline so no step exceeds ~half a voxel.
-
     Prevents signal holes where a sparsely-sampled fiber skips over a voxel.
-    Each original segment is linearly subdivided; tangents are carried from the
-    segment start (they vary slowly relative to the subdivision scale).
 
     Parameters
     ----------

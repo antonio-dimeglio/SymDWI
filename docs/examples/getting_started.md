@@ -26,14 +26,14 @@ b1_pts = np.array([
     [50, 10, 30]
 ])
 
-b1 = symdwi.Bundle(
+b1 = symdwi.Bundle(symdwi.BundleGeometry(
     b1_pts,
     n_streamlines=500,
     radius=3.0,
     n_samples=100,
     degree=3,
     dispersion=0.25
-)
+))
 
 
 b2_pts = np.array([
@@ -46,14 +46,14 @@ b2_pts = np.array([
     [53, 40, 30]
 ])
 
-b2 = symdwi.Bundle(
+b2 = symdwi.Bundle(symdwi.BundleGeometry(
     b2_pts,
     n_streamlines=500,
     radius=3.0,
     n_samples=100,
     degree=3,
     dispersion=0.25
-)
+))
 ```
 
 Once we are satisfied with the bundle(s) generated, we move onto defining the parameters that define the DWI simulation itself, we will start by getting some bvals and bvecs
@@ -64,14 +64,17 @@ bvals, bvecs = symdwi.generate_bvals_bvecs(shells=[(1000, 8), (2000, 8), (3000, 
 Notice that it's possible to specify the number of b0 values prepended to the array. 
 Users are also more than welcome to generate and/or load their own bvals and bvecs, though if the objective is to load downstream onto FSL/Mrtrix, its critical that they respect the _radiological_ convention that those tool expect. This is also possible to do when saving the final dwi produced, see `world_bvecs_to_fsl` and `save_dwi`.
 
-Now that we have bvals and bvecs, its time to model the diffusivity of water in the phantom! We do so by defining a value of DWIParameters type:
+Now that we have bvals and bvecs, its time to model the diffusivity of water in the phantom! Biophysical parameters are split across two dataclasses: `TissueParameters` (per-tract Standard Model compartment values, such  diffusivities,
+T2s, the CSF split ratio, and the axon-radius packing-density calibration) and `ScanParameters` (values that stay
+fixed for the whole volume regardless of which bundle a voxel belongs to — echo time, free-water/GM diffusivities,
+background CSF).
 
 ```python
-params = symdwi.DWIParameters(
-    f_intra=0.7,
-    f_extra=0.3,
-    f_csf=0.0,
-    axon_radius_um=1.0,
+tissue = symdwi.TissueParameters(
+    f_csf_split=0.0,
+    axon_radius=1.0,
+)
+scan = symdwi.ScanParameters(
     te_ms=80.0,
     background_csf=0.00,
 )
@@ -79,8 +82,11 @@ params = symdwi.DWIParameters(
 
 We left most parameters to preset values as they are sensible defaults for the experiment we are performing here.
 
-The parameters that DWIParameters describe belong to the Standard Model of White Matter, which predicts the DWI signal that would arise from a given fiber population geometry under a set of biophysical assumptions.
-To better understand what these assumptions are, see the doc for `DWIParameters`.
+The parameters that `TissueParameters` describes belong to the Standard Model of White Matter, which predicts the DWI signal that would arise from a given fiber population geometry under a set of biophysical assumptions.
+To better understand what these assumptions are, see the doc for `TissueParameters`.
+
+Individual bundles can also carry their own `TissueParameters` override (passed as `Bundle(geometry, tissue=...)`), which take precedence over the `tissue` default passed to `simulate_dwi` for that bundle's voxels (this is how different tracts get different diffusivities, T2s, etc). 
+Here we're keeping things simple with one shared default for both bundles.
 
 We can now start the simulation process, which is pretty straightforward
 ```python
@@ -88,7 +94,8 @@ dwi, affine, gt = symdwi.simulate_dwi(
     [b1, b2],
     bvals,
     bvecs,
-    params,
+    scan,
+    tissue=tissue,
     origin=np.array([0.0, 0.0, 0.0]),
     dims=dims,
     voxel_size=voxel_size,
