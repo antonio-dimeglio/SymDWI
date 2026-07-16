@@ -309,6 +309,15 @@ def simulate_dwi(
     max_fiber_vol = max_fiber_vol if max_fiber_vol > 0 else 1.0
     density_frac = {k: min(1.0, fv / max_fiber_vol) for k, fv in fiber_vols.items()}
 
+    voxel_totals = defaultdict(float)
+    for (key, _), frac in density_frac.items():
+        voxel_totals[key] += frac
+    for k in density_frac:
+        key, _ = k
+        total = voxel_totals[key]
+        if total > 1.0:
+            density_frac[k] /= total
+
     for key, per_bundle in volume.items():
         for bundle_idx, hist in per_bundle.items():
             total = hist.sum()
@@ -497,8 +506,6 @@ def _compute_voxel_chunk(
                 + w_extra * vf_extra * (zeppelin @ f_pop)
                 + w_csf * vf_csf_local * water
             )
-
-        wm_signal = wm_signal / max(1, len(per_bundle))
 
         if tissue_masks is None:
             signal = wm_signal

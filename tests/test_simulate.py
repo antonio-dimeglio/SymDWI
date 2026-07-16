@@ -559,7 +559,7 @@ def test_crossing_voxel_is_density_weighted_mixture():
 
     sig_a = _hand_signal(bvals, bvecs, sphere, odf_a, tissue_a, vf_a)
     sig_b = _hand_signal(bvals, bvecs, sphere, odf_b, tissue_b, vf_b)
-    expected = 0.5 * sig_a + 0.5 * sig_b
+    expected = sig_a + sig_b
 
     assert np.allclose(signal[center], expected, atol=1e-6)
 
