@@ -541,7 +541,6 @@ class MainWindow(QMainWindow):
         self._redraw_2d_active()
         self._redraw_2d_bundles()
         self._sync_points_to_table()
-        self.sidebar.draw_section.set_expanded(False)
 
     def on_undo_last_bundle(self):
         """Remove the most recently added bundle without needing to select

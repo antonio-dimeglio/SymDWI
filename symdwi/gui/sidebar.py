@@ -405,6 +405,7 @@ class BundleGeometryPanel(QWidget):
         ))
 
         form = QFormLayout()
+        form.setSpacing(6)
 
         self.radius = _spinbox(0.1, 20.0, 3.0, step=0.5)
         form.addRow("Radius (mm)", self.radius)
@@ -611,6 +612,7 @@ class TissueParamsPanel(QGroupBox):
         layout.addLayout(override_row)
 
         form = QFormLayout()
+        form.setSpacing(6)
 
         self.axon_radius = _spinbox(0.05, 20.0, 1.0, step=0.1, decimals=2)
         self.axon_radius.setToolTip(
@@ -646,6 +648,7 @@ class TissueParamsPanel(QGroupBox):
         adv_body = QWidget()
         adv_form = QFormLayout(adv_body)
         adv_form.setContentsMargins(0, 4, 0, 0)
+        adv_form.setSpacing(6)
 
         self.f_myelin = _spinbox(0.0, 1.0, 0.0, step=0.05)
         adv_form.addRow("Myelin fraction", self.f_myelin)
@@ -795,6 +798,7 @@ class ScanParamsPanel(QGroupBox):
         layout.addWidget(_hline())
 
         form = QFormLayout()
+        form.setSpacing(6)
 
         self.n_b0 = QSpinBox()
         self.n_b0.setRange(1, 20)
@@ -818,6 +822,7 @@ class ScanParamsPanel(QGroupBox):
         adv_layout.setContentsMargins(0, 4, 0, 0)
 
         adv_form = QFormLayout()
+        adv_form.setSpacing(6)
         self.background_csf = _spinbox(0.0, 1.0, 0.0, step=0.01, decimals=3)
         self.background_csf.setToolTip(
             "Constant free-water signal added to every voxel, including background."
@@ -856,6 +861,7 @@ class ScanParamsPanel(QGroupBox):
         """Creates a row with a spinbox and a 'disabled' checkbox that, when
         checked, makes the value read as None."""
         row = QHBoxLayout()
+        row.setContentsMargins(0, 0, 0, 0)
 
         spinbox = _spinbox(min_, max_, default, step)
         spinbox.setDisabled(start_none)
@@ -958,6 +964,7 @@ class GMParamsPanel(QGroupBox):
         self.form_container = QWidget()
         form = QFormLayout(self.form_container)
         form.setContentsMargins(0, 6, 0, 0)
+        form.setSpacing(6)
 
         self.f_in = _spinbox(0.0, 1.0, 0.5, step=0.05)
         form.addRow("Neurite fraction (f_in)", self.f_in)

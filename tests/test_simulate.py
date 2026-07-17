@@ -557,6 +557,11 @@ def test_crossing_voxel_is_density_weighted_mixture():
     vf_a = min(1.0, fiber_vols[(center, 0)] / max_fv)
     vf_b = min(1.0, fiber_vols[(center, 1)] / max_fv)
 
+    vf_total = vf_a + vf_b
+    if vf_total > 1.0:
+        vf_a /= vf_total
+        vf_b /= vf_total
+
     sig_a = _hand_signal(bvals, bvecs, sphere, odf_a, tissue_a, vf_a)
     sig_b = _hand_signal(bvals, bvecs, sphere, odf_b, tissue_b, vf_b)
     expected = sig_a + sig_b

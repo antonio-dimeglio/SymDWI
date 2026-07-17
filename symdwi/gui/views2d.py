@@ -15,7 +15,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.patches import Rectangle
 
-from symdwi.gui.theme import BG_0, BG_1
+from symdwi.gui.theme import BG_0, BG_1, BORDER, TEXT_DIM, TEXT_FAINT, ACCENT, OK
 
 
 class OrthoView(QWidget):
@@ -97,12 +97,12 @@ class OrthoView(QWidget):
         """Apply the dark theme colors and axis labels/title to ``self.ax``."""
         self.ax.set_facecolor(BG_1)
         for spine in self.ax.spines.values():
-            spine.set_edgecolor("#555555")
-        self.ax.tick_params(colors="#aaaaaa", labelsize=7)
+            spine.set_edgecolor(BORDER)
+        self.ax.tick_params(colors=TEXT_FAINT, labelsize=7)
         xlabel, ylabel = self._PLANE_LABELS[self.plane]
-        self.ax.set_xlabel(xlabel, color="#aaaaaa", fontsize=8)
-        self.ax.set_ylabel(ylabel, color="#aaaaaa", fontsize=8)
-        self.ax.set_title(self.plane.capitalize(), color="#cccccc", fontsize=9)
+        self.ax.set_xlabel(xlabel, color=TEXT_FAINT, fontsize=8)
+        self.ax.set_ylabel(ylabel, color=TEXT_FAINT, fontsize=8)
+        self.ax.set_title(self.plane.capitalize(), color=TEXT_DIM, fontsize=9)
 
     def set_volume(self, x_mm: float, y_mm: float, z_mm: float, voxel_size: float = None,
                    origin=None):
@@ -402,12 +402,12 @@ class OrthoView(QWidget):
             )
 
         rect = Rectangle((u0, v0), w, h,
-                          linewidth=1.5, edgecolor="#5599ff",
+                          linewidth=1.5, edgecolor=TEXT_DIM,
                           facecolor="none", linestyle="--")
         self.ax.add_patch(rect)
 
         for u, v in self._dots:
-            self.ax.plot(u, v, "o", color="#ff9900", markersize=5, zorder=5)
+            self.ax.plot(u, v, "o", color=ACCENT, markersize=5, zorder=5)
 
         for points, color in self._bundles:
             if len(points) < 1:
@@ -420,8 +420,8 @@ class OrthoView(QWidget):
         if self._active_points:
             us = [self._uv_from_point(p)[0] for p in self._active_points]
             vs = [self._uv_from_point(p)[1] for p in self._active_points]
-            self.ax.plot(us, vs, "-", color="#aaffaa", linewidth=1.2, zorder=4)
-            self.ax.plot(us, vs, "o", color="#44ff44", markersize=6, zorder=5)
+            self.ax.plot(us, vs, "-", color=OK, linewidth=1.2, zorder=4)
+            self.ax.plot(us, vs, "o", color=OK, markersize=6, zorder=5)
 
         self.ax.set_aspect("equal")
         if self._view_limits is not None:

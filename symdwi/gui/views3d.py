@@ -12,7 +12,7 @@ import pyvista as pv
 from pyvistaqt import QtInteractor
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 
-from symdwi.gui.theme import BG_0
+from symdwi.gui.theme import BG_0, TEXT_DIM
 
 
 class Preview3D(QWidget):
@@ -69,7 +69,7 @@ class Preview3D(QWidget):
         ox, oy, oz = origin
         box = pv.Box(bounds=(ox, ox + x_mm, oy, oy + y_mm, oz, oz + z_mm))
         self._box_actor = self.plotter.add_mesh(
-            box, style="wireframe", color="#5599ff", line_width=2
+            box, style="wireframe", color=TEXT_DIM, line_width=2
         )
         self.plotter.reset_camera()
 

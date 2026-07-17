@@ -1,39 +1,46 @@
-"""Modern dark theme shared across the SymDWI GUI.
+"""Neutral, tool-like dark theme shared across the SymDWI GUI.
 
 Defines the color palette, font stack, and the Qt style sheet (QSS) used to
-skin the PySide6 widgets throughout the application. Other GUI modules
-import the color constants for custom painting (e.g. canvas/scene drawing)
-and apply ``STYLESHEET`` to the ``QApplication`` for widget styling.
+skin the PySide6 widgets throughout the application. Modeled after the
+restrained, hairline-bordered look of scientific desktop tools (3D Slicer,
+MRIcroGL) rather than a generic SaaS dark mode: muted warm-neutral grays,
+a single desaturated accent reserved for primary actions/selection, and
+borders instead of glow/shadow for focus states. Other GUI modules import
+the color constants for custom painting (e.g. canvas/scene drawing) and
+apply ``STYLESHEET`` to the ``QApplication`` for widget styling.
 """
 
 # Core surface/background colors, from darkest (window) to lightest (hover).
-BG_0 = "#181a1f"       # window background
-BG_1 = "#1f2229"       # panel background
-BG_2 = "#262a33"       # input background
-BG_3 = "#2f3440"       # hover
-BORDER = "#3a3f4b"             # default border color for panels/controls
-BORDER_FOCUS = "#5b8cff"       # border color when a control has focus
-TEXT = "#e6e8ec"               # primary text color
-TEXT_DIM = "#9aa0ac"           # secondary/muted text color
-TEXT_FAINT = "#6b7280"         # tertiary/disabled text color
-ACCENT = "#5b8cff"             # primary accent color (buttons, selection)
-ACCENT_HOVER = "#7aa2ff"       # accent color on hover
-ACCENT_TEXT = "#0d1117"        # text color used on top of accent backgrounds
-DANGER = "#e5677a"             # destructive/error action color
-DANGER_HOVER = "#ef7c8e"       # destructive action color on hover
-OK = "#5fd88f"                 # success/positive status color
+# Warm neutral grays (a touch of brown/yellow undertone) rather than the
+# cool blue-grays typical of default dark-mode templates.
+BG_0 = "#1c1b1a"       # window background
+BG_1 = "#242322"       # panel background
+BG_2 = "#2a2928"       # input background
+BG_3 = "#333130"       # hover
+BORDER = "#43413e"             # default border color for panels/controls
+BORDER_FOCUS = "#a8a29a"       # border color when a control has focus (neutral, not accent-colored)
+TEXT = "#e8e6e2"               # primary text color
+TEXT_DIM = "#a8a5a0"           # secondary/muted text color
+TEXT_FAINT = "#726f6a"         # tertiary/disabled text color
+ACCENT = "#c17a4f"             # primary accent color (buttons, selection) -- muted terracotta
+ACCENT_HOVER = "#d18f66"       # accent color on hover
+ACCENT_TEXT = "#1c1b1a"        # text color used on top of accent backgrounds
+DANGER = "#b8564f"             # destructive/error action color
+DANGER_HOVER = "#c96a63"       # destructive action color on hover
+OK = "#7a9b6e"                 # success/positive status color
 
 # Cycling palette used to assign distinct colors to fiber bundles/overlays
 # in the 2D/3D views; indexed modulo len(BUNDLE_COLORS) as bundles are added.
+# Desaturated, print-plot-like hues instead of neon/saturated ones.
 BUNDLE_COLORS = [
-    "#5b8cff", "#e5677a", "#5fd88f", "#e5c07b",
-    "#c58af9", "#56c6d8", "#e5975b", "#9aa0ac",
+    "#c17a4f", "#5f8f7a", "#7b8fc4", "#c4a24f",
+    "#9a6fa0", "#5fa3ac", "#b0714f", "#8a8f6f",
 ]
 
 # Preferred system font stack, falling back across platforms (macOS, Windows,
 # generic sans-serif).
 FONT_FAMILY = (
-    '-apple-system, "SF Pro Text", "Segoe UI", "Inter", "Helvetica Neue", '
+    '-apple-system, "SF Pro Text", "Segoe UI", "Helvetica Neue", '
     "Arial, sans-serif"
 )
 
@@ -78,7 +85,7 @@ QLabel {{
 QLabel[role="heading"] {{
     color: {TEXT};
     font-weight: 600;
-    font-size: 13px;
+    font-size: 12.5px;
 }}
 QLabel[role="hint"] {{
     color: {TEXT_FAINT};
@@ -91,7 +98,7 @@ QLabel[role="value"] {{
 QGroupBox {{
     background-color: {BG_1};
     border: 1px solid {BORDER};
-    border-radius: 10px;
+    border-radius: 4px;
     margin-top: 14px;
     padding: 10px 10px 12px 10px;
     font-weight: 600;
@@ -112,13 +119,13 @@ QGroupBox[flat="true"] {{
 QPushButton {{
     background-color: {BG_2};
     border: 1px solid {BORDER};
-    border-radius: 7px;
+    border-radius: 3px;
     padding: 6px 12px;
     color: {TEXT};
 }}
 QPushButton:hover {{
     background-color: {BG_3};
-    border-color: {BORDER_FOCUS};
+    border-color: {TEXT_FAINT};
 }}
 QPushButton:pressed {{
     background-color: {BG_1};
@@ -161,7 +168,7 @@ QPushButton[variant="disclosure"] {{
     font-weight: 600;
 }}
 QPushButton[variant="disclosure"]:hover {{
-    color: {ACCENT_HOVER};
+    color: {TEXT_DIM};
 }}
 
 QPushButton[variant="segment"] {{
@@ -172,12 +179,12 @@ QPushButton[variant="segment"] {{
     color: {TEXT_DIM};
 }}
 QPushButton[variant="segment"][segment-pos="first"] {{
-    border-top-left-radius: 7px;
-    border-bottom-left-radius: 7px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
 }}
 QPushButton[variant="segment"][segment-pos="last"] {{
-    border-top-right-radius: 7px;
-    border-bottom-right-radius: 7px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
     border-left: none;
 }}
 QPushButton[variant="segment"][segment-pos="mid"] {{
@@ -197,7 +204,7 @@ QPushButton[variant="segment"]:hover:!checked {{
 QLineEdit, QDoubleSpinBox, QSpinBox, QComboBox {{
     background-color: {BG_2};
     border: 1px solid {BORDER};
-    border-radius: 6px;
+    border-radius: 3px;
     padding: 3px 6px;
     selection-background-color: {ACCENT};
 }}
@@ -225,7 +232,7 @@ QCheckBox {{
 QCheckBox::indicator {{
     width: 15px;
     height: 15px;
-    border-radius: 4px;
+    border-radius: 3px;
     border: 1px solid {BORDER};
     background-color: {BG_2};
 }}
@@ -239,7 +246,7 @@ QTableWidget {{
     alternate-background-color: {BG_1};
     gridline-color: {BORDER};
     border: 1px solid {BORDER};
-    border-radius: 6px;
+    border-radius: 3px;
 }}
 QHeaderView::section {{
     background-color: {BG_1};
@@ -260,12 +267,12 @@ QTableWidget::item:selected {{
 QListWidget {{
     background-color: {BG_2};
     border: 1px solid {BORDER};
-    border-radius: 6px;
+    border-radius: 3px;
     outline: none;
 }}
 QListWidget::item {{
     padding: 6px 4px;
-    border-radius: 4px;
+    border-radius: 2px;
 }}
 QListWidget::item:selected {{
     background-color: {ACCENT};
@@ -277,7 +284,7 @@ QListWidget::item:hover:!selected {{
 
 QTabWidget::pane {{
     border: 1px solid {BORDER};
-    border-radius: 8px;
+    border-radius: 4px;
     top: -1px;
     background-color: {BG_1};
 }}
@@ -286,8 +293,8 @@ QTabBar::tab {{
     color: {TEXT_DIM};
     padding: 7px 12px;
     margin-right: 2px;
-    border-top-left-radius: 7px;
-    border-top-right-radius: 7px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 }}
 QTabBar::tab:selected {{
     background-color: {BG_1};
@@ -339,10 +346,10 @@ QToolTip {{
     color: {TEXT};
     border: 1px solid {BORDER};
     padding: 4px 6px;
-    border-radius: 4px;
+    border-radius: 3px;
 }}
 
 QSplitter::handle:hover {{
-    background-color: {BORDER_FOCUS};
+    background-color: {TEXT_FAINT};
 }}
 """
