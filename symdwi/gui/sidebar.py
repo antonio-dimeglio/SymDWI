@@ -994,6 +994,15 @@ class GMParamsPanel(QGroupBox):
         self.small_delta_ms = _spinbox(0.1, 200.0, 13.0, step=0.5)
         form.addRow("Pulse duration delta (ms)", self.small_delta_ms)
 
+        self.t2_in_ms = _spinbox(1.0, 500.0, 99.0, step=1.0)
+        form.addRow("T2 intra-neurite (ms)", self.t2_in_ms)
+
+        self.t2_is_ms = _spinbox(1.0, 500.0, 99.0, step=1.0)
+        form.addRow("T2 intra-soma (ms)", self.t2_is_ms)
+
+        self.t2_ec_ms = _spinbox(1.0, 500.0, 99.0, step=1.0)
+        form.addRow("T2 extracellular (ms)", self.t2_ec_ms)
+
         layout.addWidget(self.form_container)
 
         self.f_in.valueChanged.connect(self._update_f_is)
@@ -1021,6 +1030,9 @@ class GMParamsPanel(QGroupBox):
             d_is=self.d_is.value() * 1e-3,
             big_delta_ms=self.big_delta_ms.value(),
             small_delta_ms=self.small_delta_ms.value(),
+            t2_in_ms=self.t2_in_ms.value(),
+            t2_is_ms=self.t2_is_ms.value(),
+            t2_ec_ms=self.t2_ec_ms.value(),
         )
 
 

@@ -64,6 +64,10 @@ class GMParameters:
     small_delta_ms : float
         Gradient pulse duration delta (ms). Fixed, single value for the
         whole acquisition.
+    t2_in_ms, t2_is_ms, t2_ec_ms : float
+        Transverse relaxation times (ms) for the intra-neurite, intra-soma,
+        and extracellular compartments. Only applied when
+        `ScanParameters.te_ms` is not None.
     """
     f_in: float = 0.5
     f_ec: float = 0.35
@@ -73,6 +77,9 @@ class GMParameters:
     d_is: float = 3.0e-3
     big_delta_ms: float = 22.0
     small_delta_ms: float = 13.0
+    t2_in_ms: float = 99.0
+    t2_is_ms: float = 99.0
+    t2_ec_ms: float = 99.0
 
     def __post_init__(self):
         assert 0.0 <= self.f_in <= 1.0, f"f_in must be in [0, 1], got {self.f_in}"
@@ -91,6 +98,9 @@ class GMParameters:
             f"small_delta_ms (pulse duration) must be <= big_delta_ms "
             f"(diffusion time), got delta={self.small_delta_ms}, Delta={self.big_delta_ms}"
         )
+        assert self.t2_in_ms > 0.0, f"t2_in_ms must be > 0, got {self.t2_in_ms}"
+        assert self.t2_is_ms > 0.0, f"t2_is_ms must be > 0, got {self.t2_is_ms}"
+        assert self.t2_ec_ms > 0.0, f"t2_ec_ms must be > 0, got {self.t2_ec_ms}"
 
     @property
     def f_is(self) -> float:
@@ -527,7 +537,7 @@ def _compute_voxel_chunk(
             w_csf_bg = np.exp(-scan.te_ms / scan.t2_csf_ms) if scan.te_ms is not None else 1.0
             signal = (
                 wm_frac * wm_signal
-                + gm_frac * w_csf_bg * gm_signal
+                + gm_frac * gm_signal
                 + csf_frac * w_csf_bg * water
             )
 
@@ -602,10 +612,16 @@ def compute_signal(
     )
     neurite_signal = isotropic_stick_attenuation(bvals, gm.d_in)
     ec_signal = np.exp(-bvals * gm.d_ec)
+    if scan.te_ms is not None:
+        w_in = np.exp(-scan.te_ms / gm.t2_in_ms)
+        w_is = np.exp(-scan.te_ms / gm.t2_is_ms)
+        w_ec = np.exp(-scan.te_ms / gm.t2_ec_ms)
+    else:
+        w_in = w_is = w_ec = 1.0
     gm_signal = (
-        gm.f_is * soma_signal
-        + gm.f_in * neurite_signal
-        + gm.f_ec * ec_signal
+        gm.f_is * w_is * soma_signal
+        + gm.f_in * w_in * neurite_signal
+        + gm.f_ec * w_ec * ec_signal
     )
 
     if scan.background_csf > 0.0:

@@ -31,14 +31,17 @@ pts = np.array([
     [30, 29, 25],
     [30, 30, 45],
 ], dtype=float)
-bundle = symdwi.Bundle(pts, n_streamlines=200, radius=4.0, seed=0)
+geometry = symdwi.BundleGeometry(pts, n_streamlines=200, radius=4.0, seed=0)
+bundle = symdwi.Bundle(geometry)
 
 # Generate gradient table (1 b=0 + 64 x b1000 + 64 x b2500 = 129 volumes)
 bvals, bvecs = symdwi.generate_bvals_bvecs(seed=42)
 
 # Simulate DWI
-params = symdwi.DWIParameters(f_intra=0.7, f_extra=0.3, f_csf=0.0, te_ms=80.0)
-dwi, affine = symdwi.simulate_dwi([bundle], bvals, bvecs, params, dims=(60, 60, 60))
+scan = symdwi.ScanParameters(te_ms=80.0)
+dwi, affine = symdwi.simulate_dwi(
+    [bundle], bvals, bvecs, scan, origin=np.zeros(3), dims=(60, 60, 60),
+)
 
 # Save outputs
 symdwi.save_dwi(dwi, affine, bvals, bvecs, "output/")

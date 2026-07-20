@@ -89,8 +89,8 @@ class TissueParameters:
 
     axon_radius: float | None = 1.0
 
-    t2_intra_ms: float = 70.0
-    t2_extra_ms: float = 70.0
+    t2_intra_ms: float = 80.0
+    t2_extra_ms: float = 45.0
     t2_myelin_ms: float = 15.0
     f_myelin: float = 0.0
 

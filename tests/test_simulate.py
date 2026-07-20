@@ -354,6 +354,74 @@ def test_tissue_mask_voxels_with_no_bundle_still_get_signal():
     assert np.allclose(csf_signal[0, 0, 0], expected_csf)
 
 
+def test_gm_t2_weighting_applies_and_is_independent_of_csf_t2():
+    # GM tissue water must relax with its own SANDI-compartment T2 fields, not the free-water
+    # (CSF) T2 -- this was the bug being fixed (GM was multiplied by w_csf_bg).
+    bvals, bvecs = symdwi.generate_bvals_bvecs(shells=[(1000, 10)], n_b0=1, seed=1)
+    dims = (10, 10, 10)
+    masks = {"gm": np.ones(dims)}
+
+    scan = symdwi.ScanParameters(te_ms=80.0, t2_csf_ms=2000.0)
+
+    baseline, _ = symdwi.simulate_dwi(
+        [], bvals, bvecs, scan, origin=np.zeros(3), dims=dims,
+        voxel_size=1.0, tissue_masks=masks,
+        gm=symdwi.GMParameters(t2_in_ms=99.0, t2_is_ms=99.0, t2_ec_ms=99.0),
+    )
+    changed_gm_t2, _ = symdwi.simulate_dwi(
+        [], bvals, bvecs, scan, origin=np.zeros(3), dims=dims,
+        voxel_size=1.0, tissue_masks=masks,
+        gm=symdwi.GMParameters(t2_in_ms=40.0, t2_is_ms=40.0, t2_ec_ms=40.0),
+    )
+    assert not np.allclose(baseline, changed_gm_t2)
+
+    # Changing only t2_csf_ms must not move the GM signal at all.
+    scan_other_csf_t2 = symdwi.ScanParameters(te_ms=80.0, t2_csf_ms=500.0)
+    same_gm_diff_csf_t2, _ = symdwi.simulate_dwi(
+        [], bvals, bvecs, scan_other_csf_t2, origin=np.zeros(3), dims=dims,
+        voxel_size=1.0, tissue_masks=masks,
+        gm=symdwi.GMParameters(t2_in_ms=99.0, t2_is_ms=99.0, t2_ec_ms=99.0),
+    )
+    assert np.allclose(baseline, same_gm_diff_csf_t2)
+
+
+def test_gm_t2_ignored_when_te_ms_is_none():
+    # With T2 relaxation weighting disabled (te_ms=None), GM T2 fields must have no effect and
+    # the b=0 signal must equal the volume-fraction-weighted SANDI compartment sum (not 1.0).
+    bvals, bvecs = symdwi.generate_bvals_bvecs(shells=[(1000, 10)], n_b0=1, seed=1)
+    dims = (10, 10, 10)
+    masks = {"gm": np.ones(dims)}
+    scan = symdwi.ScanParameters(te_ms=None)
+
+    gm_default = symdwi.GMParameters()
+    signal_default, _ = symdwi.simulate_dwi(
+        [], bvals, bvecs, scan, origin=np.zeros(3), dims=dims,
+        voxel_size=1.0, tissue_masks=masks, gm=gm_default,
+    )
+    signal_diff_t2, _ = symdwi.simulate_dwi(
+        [], bvals, bvecs, scan, origin=np.zeros(3), dims=dims,
+        voxel_size=1.0, tissue_masks=masks,
+        gm=symdwi.GMParameters(t2_in_ms=10.0, t2_is_ms=10.0, t2_ec_ms=10.0),
+    )
+    assert np.allclose(signal_default, signal_diff_t2)
+
+    from symdwi.gm_compartments import gpd_sphere_attenuation, isotropic_stick_attenuation
+    soma_signal = gpd_sphere_attenuation(
+        bvals, gm_default.big_delta_ms, gm_default.small_delta_ms,
+        gm_default.d_is, gm_default.r_s,
+    )
+    neurite_signal = isotropic_stick_attenuation(bvals, gm_default.d_in)
+    ec_signal = np.exp(-bvals * gm_default.d_ec)
+    expected = (
+        gm_default.f_is * soma_signal
+        + gm_default.f_in * neurite_signal
+        + gm_default.f_ec * ec_signal
+    )
+    assert np.allclose(signal_default[0, 0, 0, :], expected)
+    # A non-b0 shell must show attenuation (i.e. not be forced to 1.0 like the old CSF-T2 bug).
+    assert not np.isclose(expected[-1], 1.0)
+
+
 def test_csf_tissue_mask_takes_precedence_over_f_csf_split():
     # A CSF tissue_masks entry must override per-bundle f_csf_split entirely.
     bvals, bvecs = symdwi.generate_bvals_bvecs(shells=[(1000, 20)], n_b0=1, seed=1)
