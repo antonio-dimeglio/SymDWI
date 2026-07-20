@@ -35,7 +35,7 @@ class BundleGeometry:
         RNG seed.
     """
     control_points: np.ndarray
-    n_streamlines: int = 1000
+    n_streamlines: int = 10000
     radius: float = 2.0
     n_samples: int = 128
     degree: int = 3

@@ -411,8 +411,8 @@ class BundleGeometryPanel(QWidget):
         form.addRow("Radius (mm)", self.radius)
 
         self.n_streamlines = QSpinBox()
-        self.n_streamlines.setRange(1, 100000)
-        self.n_streamlines.setValue(200)
+        self.n_streamlines.setRange(1, 1000000)
+        self.n_streamlines.setValue(10000)
         form.addRow("Streamlines", self.n_streamlines)
 
         self.n_samples = QSpinBox()
@@ -420,7 +420,7 @@ class BundleGeometryPanel(QWidget):
         self.n_samples.setValue(128)
         form.addRow("Samples/streamline", self.n_samples)
 
-        self.dispersion = _spinbox(0.0, 10.0, 0.5, step=0.1)
+        self.dispersion = _spinbox(0.0, 10.0, 0.25, step=0.1)
         form.addRow("Dispersion (mm)", self.dispersion)
 
         self.smoothing = _spinbox(0.0, 10.0, 0.0, step=0.1)
