@@ -346,6 +346,68 @@ class Bundle:
             self.tangents.append(_normalize(t))
 
 
+def visualize_bundles(
+    bundles: list["Bundle"],
+    mode: str = "solid",
+    colors: list | None = None,
+    show_centerlines: bool = True,
+    interactive: bool = True,
+    save_path: str | None = None,
+):
+    """
+    Render multiple bundles together.
+
+    Parameters
+    ----------
+    bundles : list[Bundle]
+    mode : str
+        "solid" (default): each bundle gets one flat color.
+        "tangent": each streamline colored by direction, same as
+        Bundle.visualize().
+    colors : list or None
+        Only used when mode == "solid". List of RGB(A) colors, one per
+        bundle. Cycled if shorter than `bundles`.
+    show_centerlines : bool
+        Draw each bundle's centerline in black on top of its streamlines.
+    interactive : bool
+        Open an interactive window.
+    save_path : str or None
+        If given, save a screenshot to this path.
+    """
+    from fury import actor, window
+
+    if mode not in ("solid", "tangent"):
+        raise ValueError(f"mode must be 'solid' or 'tangent', got {mode!r}")
+
+    if colors is None:
+        colors = [
+            (0.121, 0.466, 0.705), (1.0, 0.498, 0.055), (0.173, 0.627, 0.173),
+            (0.839, 0.153, 0.157), (0.580, 0.404, 0.741), (0.549, 0.337, 0.294),
+            (0.890, 0.467, 0.761), (0.498, 0.498, 0.498), (0.737, 0.741, 0.133),
+            (0.090, 0.745, 0.812),
+        ]
+
+    scene = window.Scene()
+    scene.background((1, 1, 1))
+
+    for i, bundle in enumerate(bundles):
+        if mode == "tangent":
+            stream_colors = [np.abs(t) for t in bundle.tangents]
+        else:
+            stream_colors = colors[i % len(colors)]
+
+        scene.add(actor.line(bundle.streamlines, colors=stream_colors, linewidth=2))
+
+        if show_centerlines and getattr(bundle, "centerline", None) is not None:
+            scene.add(actor.line([bundle.centerline], colors=(0, 0, 0), linewidth=4))
+
+    if save_path:
+        window.record(scene, out_path=save_path, size=(900, 900))
+    if interactive:
+        window.show(scene, size=(900, 900), title="Bundles")
+    return scene
+
+
 def _normalize(v):
     n = np.linalg.norm(v, axis=-1, keepdims=True)
     return v / np.where(n == 0, 1, n)
