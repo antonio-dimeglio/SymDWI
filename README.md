@@ -3,7 +3,7 @@
 Synthetic diffusion MRI phantom library. Define white matter fiber bundles programmatically and simulate realistic DWI signal using the Standard Model (stick + zeppelin + ball compartments).
 
 ## Install
-The library is now available on pypy, simply do:
+The library is now available on PyPI, simply do:
 ```bash
 pip install symdwi
 ```
